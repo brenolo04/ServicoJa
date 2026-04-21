@@ -8,20 +8,20 @@ public class OrdemServico : EntidadeBase
 
     #region Construtor
 
-    public OrdemServico(long idPrestador, string nomeSolicitante, long idServico, DateTime dataMarcado, Endereco endereco)
+    public OrdemServico(long idPerfilPrestador, string nomeSolicitante, long idServico, DateTime dataMarcado, Endereco endereco)
     {
-        IdPrestador = idPrestador;
-        IdSolicitante = null;
+        IdPerfilPrestador = idPerfilPrestador;
+        IdPerfilSolicitante = null;
         NomeSolicitante = nomeSolicitante;
         SolicitanteAnonimo = true;
         IdServico = idServico;
         Endereco = endereco;
         DataMarcado = dataMarcado;
     }
-    public OrdemServico(long idPrestador, long idSolicitante, long idServico, DateTime dataMarcado, Endereco endereco)
+    public OrdemServico(long idPerfilPrestador, long idPerfilSolicitante, long idServico, DateTime dataMarcado, Endereco endereco)
     {
-        IdPrestador = idPrestador;
-        IdSolicitante = idSolicitante;
+        IdPerfilPrestador = idPerfilPrestador;
+        IdPerfilSolicitante = idPerfilSolicitante;
         NomeSolicitante = null;
         SolicitanteAnonimo = false;
         IdServico = idServico;
@@ -34,8 +34,8 @@ public class OrdemServico : EntidadeBase
     #region Propiedades
 
     public long IdServico { get; init; }
-    public long IdPrestador { get; init; }
-    public long? IdSolicitante { get; private set; }
+    public long IdPerfilPrestador { get; init; }
+    public long? IdPerfilSolicitante { get; private set; }
     public string? NomeSolicitante { get; private set; }
     public bool SolicitanteAnonimo { get; private set; }
     public Endereco Endereco { get; private set; }
@@ -48,8 +48,8 @@ public class OrdemServico : EntidadeBase
 
     #region NavigationProperties
 
-    public Perfil Prestador { get; init; }
-    public Perfil? Solicitante { get; init; }
+    public Perfil PerfilPrestador { get; init; }
+    public Perfil? PerfilSolicitante { get; init; }
     public Servico Servico { get; init; }
 
     #endregion
@@ -61,13 +61,13 @@ public class OrdemServico : EntidadeBase
 
         if (!string.IsNullOrEmpty(nomeSolicitante))
         {
-            IdSolicitante = null;
+            IdPerfilSolicitante = null;
             NomeSolicitante = nomeSolicitante;
             SolicitanteAnonimo = true;
         }
         else if (idSolicitante is > 0 && idSolicitante != null)
         {
-            IdSolicitante = idSolicitante;
+            IdPerfilSolicitante = idSolicitante;
             NomeSolicitante = null;
             SolicitanteAnonimo = false;
         }

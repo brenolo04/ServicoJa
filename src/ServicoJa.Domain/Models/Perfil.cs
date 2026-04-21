@@ -8,23 +8,27 @@ public class Perfil : EntidadeBase
     }
 
     public long IdUsuarioIdentity { get; init; }
-    public IList<OrdemServico> OrdemServicos { get; private set; }
-    public IList<Servico> Servicos { get; private set; }
 
     #region NavigationProperties
+
+    public IList<OrdemServico> OrdemServicosPrestados { get; private set; }
+    public IList<OrdemServico> OrdemServicosSolicitados { get; private set; }
+    public IList<Servico> Servicos { get; private set; }
 
     #endregion
 
     #region Regras
 
-    public void AtualizarPefil()
+    public IEnumerable<OrdemServico> AdicionarPrestacaoDeServico(OrdemServico ordemServico)
     {
+        OrdemServicosPrestados.Add(ordemServico);
+        return OrdemServicosPrestados;
     }
-
-    public IEnumerable<OrdemServico> AdicionarOrdemServico(OrdemServico ordemServico)
+    
+    public IEnumerable<OrdemServico> AdicionarSolicitacaoDeServico(OrdemServico ordemServico)
     {
-        OrdemServicos.Add(ordemServico);
-        return OrdemServicos;
+        OrdemServicosSolicitados.Add(ordemServico);
+        return OrdemServicosSolicitados;
     }
 
     public IEnumerable<Servico> AdicionarServico(Servico servico)
