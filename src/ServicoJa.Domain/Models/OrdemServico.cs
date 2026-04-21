@@ -40,7 +40,7 @@ public class OrdemServico : EntidadeBase
     public bool SolicitanteAnonimo { get; private set; }
     public Endereco Endereco { get; private set; }
     public DateTime DataMarcado { get; private set; }
-    public DateTime DataFinalizado { get; private set; }
+    public DateTime? DataFinalizado { get; private set; }
     public DateTime DataCriacao { get; } = DateTime.Now;
     public EStatusServico Status { get; private set; } = EStatusServico.AguardandoAprovacao;
 
