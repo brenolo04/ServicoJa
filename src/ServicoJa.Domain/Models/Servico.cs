@@ -4,7 +4,7 @@ public class Servico : EntidadeBase
 {
     #region Construtor
 
-    public Servico(long idPerfil, string nome, string descricao, float valor)
+    public Servico(long idPerfil, string nome, string descricao, decimal valor)
     {
         IdPerfil = idPerfil;
         Nome = nome;
@@ -19,7 +19,7 @@ public class Servico : EntidadeBase
     public long IdPerfil { get; init; }
     public string Nome { get; private set; }
     public string Descricao { get; private set; }
-    public float Valor { get; private set; }
+    public decimal Valor { get; private set; }
     public bool Inativo { get; private set; } = false;
     public DateTime DataCriado { get; } = DateTime.Now;
 
@@ -31,7 +31,7 @@ public class Servico : EntidadeBase
 
     #region Regras
 
-    public void AtualizarServico(string nome, string descricao, float valor)
+    public void AtualizarServico(string nome, string descricao, decimal valor)
     {
         Nome = nome;
         Descricao = descricao;
