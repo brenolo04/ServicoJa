@@ -19,16 +19,20 @@ public class Perfil : EntidadeBase
 
     #region Regras
 
-    public IEnumerable<OrdemServico> AdicionarPrestacaoDeServico(OrdemServico ordemServico)
+    public void AdicionarPrestacaoDeServico(OrdemServico ordemServico)
     {
+        if (ordemServico.IdPerfilPrestador != Id) 
+            throw new AppDomainUnloadedException();
+
         OrdemServicosPrestados.Add(ordemServico);
-        return OrdemServicosPrestados;
     }
     
-    public IEnumerable<OrdemServico> AdicionarSolicitacaoDeServico(OrdemServico ordemServico)
+    public void AdicionarSolicitacaoDeServico(OrdemServico ordemServico)
     {
+        if (ordemServico.IdPerfilSolicitante != Id)
+            throw new AppDomainUnloadedException();
+
         OrdemServicosSolicitados.Add(ordemServico);
-        return OrdemServicosSolicitados;
     }
 
     public IEnumerable<Servico> AdicionarServico(Servico servico)
