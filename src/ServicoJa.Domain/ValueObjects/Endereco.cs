@@ -6,7 +6,7 @@ public record Endereco
     public string Bairro;
     public string Cidade;
     public string? Numero;
-    public string CEP;
+    public string Cep;
 
     public Endereco(string rua, string bairro, string cidade, string cep, string numero = null)
     {
@@ -14,6 +14,6 @@ public record Endereco
         Bairro = bairro;
         Cidade = cidade;
         Numero = numero;
-        CEP = cep;
+        Cep = cep;
     }
 }

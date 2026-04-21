@@ -8,24 +8,22 @@ public class OrdemServico : EntidadeBase
 
     #region Construtor
 
-    public OrdemServico(long idPerfilPrestador, string nomeSolicitante, long idServico, DateTime dataMarcado, Endereco endereco)
+    public OrdemServico(long idPerfilPrestador, string nomeSolicitante, long idServico, DateTime dataMarcado)
     {
         IdPerfilPrestador = idPerfilPrestador;
         IdPerfilSolicitante = null;
         NomeSolicitante = nomeSolicitante;
         SolicitanteAnonimo = true;
         IdServico = idServico;
-        Endereco = endereco;
         DataMarcado = dataMarcado;
     }
-    public OrdemServico(long idPerfilPrestador, long idPerfilSolicitante, long idServico, DateTime dataMarcado, Endereco endereco)
+    public OrdemServico(long idPerfilPrestador, long idPerfilSolicitante, long idServico, DateTime dataMarcado)
     {
         IdPerfilPrestador = idPerfilPrestador;
         IdPerfilSolicitante = idPerfilSolicitante;
         NomeSolicitante = null;
         SolicitanteAnonimo = false;
         IdServico = idServico;
-        Endereco = endereco;
         DataMarcado = dataMarcado;
     }
 
@@ -78,6 +76,9 @@ public class OrdemServico : EntidadeBase
         DataMarcado = dataMarcado;
 
     }
+
+    public void VincularEndereco(Endereco endereco)
+        => Endereco = endereco;
 
     public void FinalizarOrdemServico()
     {
