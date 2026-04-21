@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Config/Mappings/" />
     <Folder Include="Repositories/" />
     <Folder Include="Services/" />
   </ItemGroup>
