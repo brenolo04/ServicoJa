@@ -83,12 +83,12 @@ public class OrdemServicoMap : IEntityTypeConfiguration<OrdemServico>
         });
 
         builder.HasOne(o => o.PerfilPrestador)
-            .WithMany(p => p.OrdemServicosPrestados)
+            .WithMany()
             .HasForeignKey(o => o.IdPerfilPrestador)
             .OnDelete(DeleteBehavior.Restrict);
             
         builder.HasOne(o => o.PerfilSolicitante)
-            .WithMany(p => p.OrdemServicosSolicitados)
+            .WithMany()
             .HasForeignKey(o => o.IdPerfilSolicitante)
             .OnDelete(DeleteBehavior.Restrict);
             
