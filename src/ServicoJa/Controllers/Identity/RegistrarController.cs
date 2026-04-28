@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ServicoJa.Domain.Models;
 using ServicoJa.Infra.Config;
 
 namespace ServicoJa.Controllers.Identity;
@@ -11,10 +12,12 @@ public class RegistrarController : ControllerBase
     public sealed record RegistrarRequest(string Email, string Senha);
 
     private readonly UserManager<UsuarioIdentity> _userManager;
+    private readonly ServicoJaDbContext _servicoJaDbContext;
     
-    public RegistrarController(UserManager<UsuarioIdentity> userManager)
+    public RegistrarController(UserManager<UsuarioIdentity> userManager, ServicoJaDbContext dbContext)
     {
         _userManager = userManager;
+        _servicoJaDbContext = dbContext;
     }
 
     [HttpPost]
@@ -32,11 +35,28 @@ public class RegistrarController : ControllerBase
             Email = request.Email
         };
 
-        var resultado = await _userManager.CreateAsync(usuario, request.Senha);
+        using var transaction = await _servicoJaDbContext.Database.BeginTransactionAsync();
 
-        if (!resultado.Succeeded)
-            return BadRequest(resultado.Errors);
-        
-        return Ok(usuario);
+        try
+        {
+            var resultado = await _userManager.CreateAsync(usuario, request.Senha);
+
+            if (!resultado.Succeeded)
+                return BadRequest(resultado.Errors);
+
+            var perfil = new Perfil(usuario.Id);
+
+            _servicoJaDbContext.Perfis.Add(perfil);
+            await _servicoJaDbContext.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return Ok(new { Mensagem = "Usuário criado" });
+        }
+        catch 
+        {
+            transaction.Rollback();
+            return StatusCode(500, new { Mensagem = "Erro ao tentar criar usuário" });
+        }
     }
 }
