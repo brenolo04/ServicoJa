@@ -15,11 +15,13 @@ public class LoginController : ControllerBase
     public sealed record LoginRequest(string Email, string Senha);
 
     private readonly UserManager<UsuarioIdentity> _userManager;
+    private readonly ServicoJaDbContext _context;
     private readonly IConfiguration _configuration;
 
-    public LoginController(UserManager<UsuarioIdentity> userManager, IConfiguration configuration)
+    public LoginController(UserManager<UsuarioIdentity> userManager, ServicoJaDbContext context, IConfiguration configuration)
     {
         _userManager = userManager;
+        _context = context;
         _configuration = configuration;
     }
 
@@ -37,15 +39,18 @@ public class LoginController : ControllerBase
         return Ok(new {accessToken = GerarToken(usuario) });
     }
 
-    private string GerarToken(UsuarioIdentity usuario)
+    private string GerarToken(UsuarioIdentity usuarioIdentity)
     {
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfiguration:SecretKey"]!));
         var credential = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
+        var idPerfil = _context.Perfis.FirstOrDefault(x => x.IdUsuarioIdentity == usuarioIdentity.Id);
+
         List<Claim> claims =
         [
-            new(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, usuario.Email!),
+            new(JwtRegisteredClaimNames.Sub, usuarioIdentity.Id.ToString()),
+            new("perfilId", idPerfil.Id.ToString()),
+            new(JwtRegisteredClaimNames.Email, usuarioIdentity.Email!),
         ];
 
         var tokenDescriptor = new SecurityTokenDescriptor
