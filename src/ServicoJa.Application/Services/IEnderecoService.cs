@@ -4,5 +4,5 @@ namespace ServicoJa.Domain.Interfaces.Services;
 
 public interface IEnderecoService
 {
-    Task<Endereco> EnderecoPorCep(int cep);
+    Task<Endereco> EnderecoPorCep(string cep);
 }
