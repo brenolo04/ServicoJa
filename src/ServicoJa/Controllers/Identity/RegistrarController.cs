@@ -26,19 +26,19 @@ public class RegistrarController : ControllerBase
         if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Senha))
             return BadRequest(new { Mensagem = "Email e senha devem ser preenchidos" });
 
-        if (await _userManager.FindByEmailAsync(request.Email) is not null)
-            return BadRequest(new { Mensagem = "Usuário já cadastrado com esse email, tente outro." });
-
-        var usuario = new UsuarioIdentity
-        {
-            UserName = request.Email,
-            Email = request.Email
-        };
-
         using var transaction = await _servicoJaDbContext.Database.BeginTransactionAsync();
 
         try
         {
+            if (await _userManager.FindByEmailAsync(request.Email) is not null)
+                return BadRequest(new { Mensagem = "Usuário já cadastrado com esse email, tente outro." });
+
+            var usuario = new UsuarioIdentity
+            {
+                UserName = request.Email,
+                Email = request.Email
+            };
+
             var resultado = await _userManager.CreateAsync(usuario, request.Senha);
 
             if (!resultado.Succeeded)

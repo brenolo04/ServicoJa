@@ -28,15 +28,23 @@ public class LoginController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> LogarAsync(LoginRequest request)
     {
-        if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Senha))
-            return BadRequest(new { Mensagem = "Email e senha devem ser preenchidos" });
+        try
+        {
+            if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Senha))
+                return BadRequest(new { Mensagem = "Email e senha devem ser preenchidos" });
 
-        var usuario = await _userManager.FindByEmailAsync(request.Email);
+            var usuario = await _userManager.FindByEmailAsync(request.Email);
 
-        if (usuario is null || !await _userManager.CheckPasswordAsync(usuario, request.Senha))
-            return BadRequest(new { Mensagem = "Usuário não encontrado ou crendenciais inválidas"});
+            if (usuario is null || !await _userManager.CheckPasswordAsync(usuario, request.Senha))
+                return BadRequest(new { Mensagem = "Usuário não encontrado ou crendenciais inválidas" });
 
-        return Ok(new {accessToken = GerarToken(usuario) });
+            return Ok(new { accessToken = GerarToken(usuario) });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { Sucesso = false, Mensagem = "Falha no servidor ao tentar se logar", Conteudo = new object() });
+        }
+        
     }
 
     private string GerarToken(UsuarioIdentity usuarioIdentity)
