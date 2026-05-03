@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>802d2b9f-f639-4688-8955-36d89385381e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../ServicoJa.Infra.IoC/ServicoJa.Infra.IoC.csproj" />
+    <ProjectReference Include="..\ServicoJa.Application\ServicoJa.Application.csproj" />
+  </ItemGroup>
+
+</Project>
