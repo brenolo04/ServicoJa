@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.5.11709.299 stable
+VisualStudioVersion = 18.5.11709.299
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicoJa", "src\ServicoJa\ServicoJa.csproj", "{5E77FEAA-5E9F-E8C1-6B9E-C7BA743EB70A}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicoJa.Infra", "src\ServicoJa.Infra\ServicoJa.Infra.csproj", "{762892F8-9B6E-CA93-341A-CB66449ABE14}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicoJa.Infra.IoC", "src\ServicoJa.Infra.IoC\ServicoJa.Infra.IoC.csproj", "{4575A1D0-CF7F-A8A4-4E52-BEBA1B03741C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicoJa.Application", "src\ServicoJa.Application\ServicoJa.Application.csproj", "{ED3979FD-7B5D-4D2C-AB63-3955BB2BEB85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,8 +35,15 @@ Global
 		{4575A1D0-CF7F-A8A4-4E52-BEBA1B03741C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4575A1D0-CF7F-A8A4-4E52-BEBA1B03741C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4575A1D0-CF7F-A8A4-4E52-BEBA1B03741C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED3979FD-7B5D-4D2C-AB63-3955BB2BEB85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED3979FD-7B5D-4D2C-AB63-3955BB2BEB85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED3979FD-7B5D-4D2C-AB63-3955BB2BEB85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED3979FD-7B5D-4D2C-AB63-3955BB2BEB85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A4B497F-9104-46B5-BF7B-A65104D3F8EE}
 	EndGlobalSection
 EndGlobal

@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using ServicoJa.Application.UseCases.Servico.Criar;
+using ServicoJa.Application.UseCases.Servico.ObterPorId;
+using ServicoJa.Application.UseCases.Servico.ObterTodos;
 using ServicoJa.Domain.Repositories;
 using ServicoJa.Infra.Config;
 using ServicoJa.Infra.Repositories;
@@ -22,8 +26,12 @@ public static class DependencyInjection
 
     public static IServiceCollection AddDependencies(this IServiceCollection services)
     {
-        services.AddTransient<IServicoRepository, ServicoRepository>();
-        services.AddTransient<IOrdemServicoRepository, OrdemServicoRepository>();
+        services.AddScoped<CriarServicoHandler>();
+        services.AddScoped<ObterServicoPorIdHandler>();
+        services.AddScoped<ObterTodosServicosHandler>();
+
+        services.AddScoped<IServicoRepository, ServicoRepository>();
+        services.AddScoped<IOrdemServicoRepository, OrdemServicoRepository>();
 
         return services;
     }
@@ -46,6 +54,39 @@ public static class DependencyInjection
         });
 
         services.AddAuthorization();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Insira apenas o token JWT no campo abaixo. Exemplo: eyJhbGci... "
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
         return services;
     }

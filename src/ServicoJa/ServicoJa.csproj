@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../ServicoJa.Infra.IoC/ServicoJa.Infra.IoC.csproj" />
+    <ProjectReference Include="..\ServicoJa.Application\ServicoJa.Application.csproj" />
   </ItemGroup>
 
 </Project>

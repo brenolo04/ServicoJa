@@ -9,7 +9,7 @@ builder.Services.AddDependencies();
 builder.Services.AddIdentityConfiguration(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerConfiguration();
 
 var app = builder.Build();
 
