@@ -10,7 +10,8 @@ public class ServicoJaDbContext(DbContextOptions<ServicoJaDbContext> opt)
 {
     public DbSet<Perfil> Perfis { get; init; }
     public DbSet<Servico> Servicos { get; init; }
-    public DbSet<OrdemServico> OrdemServicos { get; init; }
+    public DbSet<OrdemServico> OrdemServicos { get; init; }    
+    public DbSet<RefreshToken> RefreshTokens { get; init; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
