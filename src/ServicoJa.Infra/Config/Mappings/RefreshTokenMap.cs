@@ -18,6 +18,6 @@ public class RefreshTokenMap : IEntityTypeConfiguration<RefreshToken>
             .IsUnique();
 
         builder.Property(r => r.ExpiresOnUtc)
-            .HasColumnType("timestamp without time zone");
+            .HasColumnType("timestamp with time zone");
     }
 }

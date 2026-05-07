@@ -39,7 +39,7 @@ public class OrdemServico : EntidadeBase
     public Endereco Endereco { get; private set; }
     public DateTime DataMarcado { get; private set; }
     public DateTime? DataFinalizado { get; private set; }
-    public DateTime DataCriacao { get; } = DateTime.Now;
+    public DateTime DataCriacao { get; } = DateTime.UtcNow;
     public EStatusServico Status { get; private set; } = EStatusServico.AguardandoAprovacao;
 
     #endregion
@@ -54,9 +54,8 @@ public class OrdemServico : EntidadeBase
 
     #region Regras
 
-    public void AtualizarOrdemServico(long? idSolicitante, string nomeSolicitante, Endereco endereco, DateTime dataMarcado)
+    public void AtualizarSolicitante(long? idSolicitante, string nomeSolicitante)
     {
-
         if (!string.IsNullOrEmpty(nomeSolicitante))
         {
             IdPerfilSolicitante = null;
@@ -71,15 +70,13 @@ public class OrdemServico : EntidadeBase
         }
         else
             throw new AppDomainUnloadedException();
-
-        Endereco = endereco;
-        DataMarcado = dataMarcado;
+    }
+    public void AtualizarDataMarcado(DateTime data)
+    {
 
     }
-
     public void VincularEndereco(Endereco endereco)
         => Endereco = endereco;
-
     public void FinalizarOrdemServico()
     {
         if (Status == EStatusServico.Cancelado)
@@ -88,7 +85,6 @@ public class OrdemServico : EntidadeBase
         Status = EStatusServico.Finalizado;
         DataFinalizado = DateTime.Now;
     }
-
     public void CancelarOrdemServico()
         => Status = EStatusServico.Cancelado;
 

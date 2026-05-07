@@ -94,7 +94,7 @@ public class IdentityController : ControllerBase
                 Id = Guid.NewGuid(),
                 IdUsuarioIdentity = usuario.Id,
                 Token = GerarRefreshToken(),
-                ExpiresOnUtc = DateTime.Now.AddDays(7),
+                ExpiresOnUtc = DateTime.UtcNow.AddDays(7),
             };
 
             await _context.RefreshTokens.AddAsync(refreshToken);
@@ -136,7 +136,7 @@ public class IdentityController : ControllerBase
                 Id = Guid.NewGuid(),
                 Token = GerarRefreshToken(),
                 IdUsuarioIdentity = usuarioIdentity.Id,
-                ExpiresOnUtc = DateTime.Now.AddDays(7),
+                ExpiresOnUtc = DateTime.UtcNow.AddDays(7),
             };
 
             await _context.RefreshTokens.Where(x => x.IdUsuarioIdentity == usuarioIdentity.Id).ExecuteDeleteAsync();

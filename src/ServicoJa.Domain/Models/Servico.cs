@@ -21,7 +21,7 @@ public class Servico : EntidadeBase
     public string Descricao { get; private set; }
     public decimal Valor { get; private set; }
     public bool Inativo { get; private set; } = false;
-    public DateTime DataCriado { get; } = DateTime.Now;
+    public DateTime DataCriado { get; } = DateTime.UtcNow;
 
     #endregion
 
