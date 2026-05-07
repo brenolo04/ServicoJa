@@ -29,7 +29,7 @@ public class ServicoController : ControllerBase
         [FromQuery] int tamanhoPagina = 20
     )
     {
-        var idPerfil = long.Parse(User.FindFirst("perfilId")!.Value);
+        var idPerfil = long.Parse(User.FindFirst("idPerfil")!.Value);
 
         try
         {
@@ -56,7 +56,7 @@ public class ServicoController : ControllerBase
     [HttpGet("{idServico:long}")]
     public async Task<IActionResult> ObterPorId(long idServico)
     {
-        var idPerfil = long.Parse(User.FindFirst("perfilId")!.Value);
+        var idPerfil = long.Parse(User.FindFirst("idPerfil")!.Value);
 
         try
         {
@@ -76,7 +76,7 @@ public class ServicoController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CriarServicoAsync(CriarServicoRequest servicoInput)
     {
-        var idPerfil = long.Parse(User.FindFirst("perfilId")!.Value);
+        var idPerfil = long.Parse(User.FindFirst("idPerfil")!.Value);
 
         try
         {

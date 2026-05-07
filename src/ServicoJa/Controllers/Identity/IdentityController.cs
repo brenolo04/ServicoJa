@@ -165,7 +165,7 @@ public class IdentityController : ControllerBase
         List<Claim> claims =
         [
             new(JwtRegisteredClaimNames.Sub, usuarioIdentity.Id.ToString()),
-            new("perfilId", idPerfil.Id.ToString()),
+            new("idPerfil", idPerfil.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, usuarioIdentity.Email!),
         ];
 
