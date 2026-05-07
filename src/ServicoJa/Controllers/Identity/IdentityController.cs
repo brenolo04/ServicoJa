@@ -17,7 +17,7 @@ namespace ServicoJa.Controllers.Identity;
 [Route("api/identity")]
 public class IdentityController : ControllerBase
 {
-    public sealed record RegistrarRequest(string Email, string Senha);
+    public sealed record RegistrarRequest(string Nome, string Email, string Senha);
     public sealed record LoginRequest(string Email, string Senha);
     public sealed record LoginResponse(string AccessToken, string RefreshToken);
     public sealed record RefreshTokenRequest(string RefreshToken);
@@ -57,7 +57,7 @@ public class IdentityController : ControllerBase
             if (!resultado.Succeeded)
                 return BadRequest(resultado.Errors);
 
-            var perfil = new Perfil(usuario.Id);
+            var perfil = new Perfil(usuario.Id, request.Nome);
 
             _context.Perfis.Add(perfil);
             await _context.SaveChangesAsync();

@@ -2,27 +2,12 @@ namespace ServicoJa.Domain.Models;
 
 public class Perfil : EntidadeBase
 {
-    public Perfil(long idUsuarioIdentity)
+    public Perfil(long idUsuarioIdentity, string nome)
     {
         IdUsuarioIdentity = idUsuarioIdentity;
+        Nome = nome;
     }
 
     public long IdUsuarioIdentity { get; init; }
-
-    #region NavigationProperties
-
-    public IList<Servico> Servicos { get; private set; }
-
-    #endregion
-
-    #region Regras
-
-    public IEnumerable<Servico> AdicionarServico(Servico servico)
-    {
-        Servicos.Add(servico);
-        return Servicos;
-    }
-
-    #endregion
-
+    public string Nome { get; init; }
 }

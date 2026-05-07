@@ -42,7 +42,7 @@ public class ServicoMap : IEntityTypeConfiguration<Servico>
             .HasColumnType("timestamp with time zone");
 
         builder.HasOne(s => s.Perfil)
-            .WithMany(p => p.Servicos)
+            .WithMany()
             .HasForeignKey(s => s.IdPerfil)
             .OnDelete(DeleteBehavior.NoAction);
     }
