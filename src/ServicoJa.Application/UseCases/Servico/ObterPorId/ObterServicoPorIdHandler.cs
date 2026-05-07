@@ -14,9 +14,9 @@ public class ObterServicoPorIdHandler
 
     public async Task<ObterServicoPorIdResponse?> ExecuteAsync(long idServico, long idPerfil)
     {
-        var servico = await _servicoRepository.ObterServicoPorIdAsync(idServico, idPerfil);
+        var servico = await _servicoRepository.ObterServicoPorIdAsync(idServico);
 
-        if (servico is null)
+        if (servico is null || servico.IdPerfil != idPerfil)
             return null;
 
         return servico.ParaObterServicoPorIdResponse();
