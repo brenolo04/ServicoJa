@@ -17,7 +17,7 @@ public class ObterTodosOrdemServicosPrestadosHandler
         var ordemServicos = await _ordemServicoRepository.ObterTodosOrdemServicosPrestadosAsync(idPerfilRequest, paginaAtual, tamanhoPagina);
         var totalRegistros = await _ordemServicoRepository.TotalPaginasOrdemServicosPrestadosAsync(idPerfilRequest);
 
-        return ordemServicos.ParaObterTodosOrdemServicosSolicitadosResponse(totalRegistros);
+        return ordemServicos.ParaObterTodosOrdemServicosPrestadosResponse(totalRegistros);
     }
 }
 
