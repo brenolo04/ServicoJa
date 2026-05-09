@@ -84,19 +84,20 @@ public class IdentityController : ControllerBase
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Senha))
                 return BadRequest(new { Mensagem = "Email e senha devem ser preenchidos" });
 
-            var usuario = await _userManager.FindByEmailAsync(request.Email);
+            var usuarioIdentity = await _userManager.FindByEmailAsync(request.Email);
 
-            if (usuario is null || !await _userManager.CheckPasswordAsync(usuario, request.Senha))
+            if (usuarioIdentity is null || !await _userManager.CheckPasswordAsync(usuarioIdentity, request.Senha))
                 return BadRequest(new { Mensagem = "Usuário não encontrado ou crendenciais inválidas" });
 
             var refreshToken = new RefreshToken
             {
                 Id = Guid.NewGuid(),
-                IdUsuarioIdentity = usuario.Id,
+                IdUsuarioIdentity = usuarioIdentity.Id,
                 Token = GerarRefreshToken(),
                 ExpiresOnUtc = DateTime.UtcNow.AddDays(7),
             };
 
+            await _context.RefreshTokens.Where(x => x.IdUsuarioIdentity == usuarioIdentity.Id).ExecuteDeleteAsync();
             await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
 
@@ -105,7 +106,7 @@ public class IdentityController : ControllerBase
             return Ok(new Response
             {
                 Sucesso = true,
-                Conteudo = new LoginResponse(GerarToken(usuario), refreshToken.Token)
+                Conteudo = new LoginResponse(GerarToken(usuarioIdentity), refreshToken.Token)
             });
         }
         catch (Exception)
