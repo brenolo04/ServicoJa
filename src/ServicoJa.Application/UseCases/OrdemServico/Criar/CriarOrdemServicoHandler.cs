@@ -1,6 +1,7 @@
 ﻿using ServicoJa.Application.Extensions;
 using ServicoJa.Domain.Interfaces.Repositories;
 using ServicoJa.Domain.Interfaces.Services;
+using ServicoJa.Domain.Models;
 using ServicoJa.Domain.Repositories;
 
 namespace ServicoJa.Application.UseCases.OrdemServico.Criar;
@@ -31,12 +32,12 @@ public class CriarOrdemServicoHandler
         var servico = await _servicoRepository.ObterServicoPorIdAsync(request.IdServico);
         var perfil = await _perfilRepository.ObterPerfilPorIdAsync(request.IdPerfilSolicitante);
 
-        if (servico is null || perfil is null) 
+        if (servico is null && perfil is null && string.IsNullOrEmpty(request.NomeSolicitante))
             return null;
 
         var ordemServico = string.IsNullOrEmpty(request.NomeSolicitante) 
-            ? new Domain.Models.OrdemServico(servico.IdPerfil, request.IdPerfilSolicitante, request.IdServico, request.DataMarcado) 
-            : new Domain.Models.OrdemServico(servico.IdPerfil, request.NomeSolicitante, request.IdServico, request.DataMarcado);
+            ? new Domain.Models.OrdemServico(servico!.IdPerfil, request.IdPerfilSolicitante, request.IdServico, request.DataMarcado) 
+            : new Domain.Models.OrdemServico(servico!.IdPerfil, request.NomeSolicitante, request.IdServico, request.DataMarcado);
 
         var enderecoExterno = await _enderecoService.EnderecoPorCep(request.Cep);
 

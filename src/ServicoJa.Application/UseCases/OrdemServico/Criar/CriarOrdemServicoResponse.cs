@@ -4,6 +4,7 @@ namespace ServicoJa.Application.UseCases.OrdemServico.Criar;
 
 public record CriarOrdemServicoResponse
 (
+    long Id,
     long IdServico,
     long IdPerfilPrestador,
     long? IdPerfilSolicitante,
