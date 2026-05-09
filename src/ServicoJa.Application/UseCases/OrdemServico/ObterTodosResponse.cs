@@ -2,9 +2,9 @@
 
 namespace ServicoJa.Application.UseCases.OrdemServico;
 
-public record ObterTodosOrdemServicosResponse(IEnumerable<OrdemServicosSaida> OrdemServicos, int TotalRegistros);
+public record ObterTodosResponse(IEnumerable<OrdemServicoSaida> OrdemServicos, int TotalRegistros);
 
-public record OrdemServicosSaida
+public record OrdemServicoSaida
 (
     long IdOrdemServico,
     string NomeServico,
