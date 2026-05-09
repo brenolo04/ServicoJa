@@ -1,7 +1,6 @@
 ﻿using ServicoJa.Application.Extensions;
 using ServicoJa.Domain.Interfaces.Repositories;
 using ServicoJa.Domain.Interfaces.Services;
-using ServicoJa.Domain.Models;
 using ServicoJa.Domain.Repositories;
 
 namespace ServicoJa.Application.UseCases.OrdemServico.Criar;
@@ -35,6 +34,9 @@ public class CriarOrdemServicoHandler
         if (servico is null && perfil is null && string.IsNullOrEmpty(request.NomeSolicitante))
             return null;
 
+        if (servico!.Inativo)
+            return null;
+
         var ordemServico = string.IsNullOrEmpty(request.NomeSolicitante) 
             ? new Domain.Models.OrdemServico(servico!.IdPerfil, request.IdPerfilSolicitante, request.IdServico, request.DataMarcado) 
             : new Domain.Models.OrdemServico(servico!.IdPerfil, request.NomeSolicitante, request.IdServico, request.DataMarcado);
@@ -53,5 +55,4 @@ public class CriarOrdemServicoHandler
 
         return ordemServico.ParaCriarOrdemServicoResponse();
     }
-
 }

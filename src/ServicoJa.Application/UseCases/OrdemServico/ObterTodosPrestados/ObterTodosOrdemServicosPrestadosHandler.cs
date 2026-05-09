@@ -12,7 +12,7 @@ public class ObterTodosOrdemServicosPrestadosHandler
         _ordemServicoRepository = ordemServicoRepository;
     }
 
-    public async Task<ObterTodosOrdemServicosResponse?> ExecuteAsync(long idPerfilRequest, int paginaAtual, int tamanhoPagina)
+    public async Task<ObterTodosResponse?> ExecuteAsync(long idPerfilRequest, int paginaAtual, int tamanhoPagina)
     {
         var ordemServicos = await _ordemServicoRepository.ObterTodosOrdemServicosPrestadosAsync(idPerfilRequest, paginaAtual, tamanhoPagina);
         var totalRegistros = await _ordemServicoRepository.TotalPaginasOrdemServicosPrestadosAsync(idPerfilRequest);

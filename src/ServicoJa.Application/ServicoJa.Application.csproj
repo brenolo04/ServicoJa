@@ -10,8 +10,4 @@
     <ProjectReference Include="..\ServicoJa.Domain\ServicoJa.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="UseCases\OrdemServico\Atualizar\" />
-  </ItemGroup>
-
 </Project>

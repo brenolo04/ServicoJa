@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServicoJa.Application.UseCases;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Aprovar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Cancelar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Executar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Finalizar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
 using ServicoJa.Application.UseCases.OrdemServico.Criar;
 using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
 using ServicoJa.Application.UseCases.OrdemServico.ObterTodosPrestados;
@@ -17,18 +22,34 @@ public class OrdemServicoController : ControllerBase
     private readonly ObterOrdemServicoPorIdHandler _ordemServicoPorIdHandler;
     private readonly ObterTodosOrdemServicosPrestadosHandler _obterTodosOrdemServicosPrestadosHandler;
     private readonly ObterTodosOrdemServicosSolicitadosHandler _obterTodosOrdemServicosSolicitadosHandler;
+    private readonly AprovarOrdemServicoHandler _aprovarOrdemServicoHandler;
+    private readonly ExecutarOrdemServicoHandler _executarOrdemServicoHandler;
+    private readonly FinalizarOrdemServicoHandler _finalizarOrdemServicoHandler;
+    private readonly CancelarOrdemServicoHandler _cancelarOrdemServicoHandler;
+    private readonly SolicitanteAnonimoHandler _solicitanteAnonimoHandler;
+    
     public OrdemServicoController
     (
         CriarOrdemServicoHandler criarOrdemServicoHandler, 
         ObterOrdemServicoPorIdHandler obterOrdemServicoPorIdHandler,
         ObterTodosOrdemServicosPrestadosHandler obterTodosOrdemServicosPrestadosHandler,
-        ObterTodosOrdemServicosSolicitadosHandler obterTodosOrdemServicosSolicitadosHandler
+        ObterTodosOrdemServicosSolicitadosHandler obterTodosOrdemServicosSolicitadosHandler,
+        AprovarOrdemServicoHandler aprovarOrdemServicoHandler,
+        ExecutarOrdemServicoHandler executarOrdemServicoHandler,
+        FinalizarOrdemServicoHandler finalizarOrdemServicoHandler,
+        CancelarOrdemServicoHandler cancelarOrdemServicoHandler,
+        SolicitanteAnonimoHandler solicitanteAnonimoHandler
     )
     {
         _criarOrdemServicoHandler = criarOrdemServicoHandler;
         _ordemServicoPorIdHandler = obterOrdemServicoPorIdHandler;
         _obterTodosOrdemServicosPrestadosHandler = obterTodosOrdemServicosPrestadosHandler;
         _obterTodosOrdemServicosSolicitadosHandler = obterTodosOrdemServicosSolicitadosHandler;
+        _aprovarOrdemServicoHandler = aprovarOrdemServicoHandler;
+        _executarOrdemServicoHandler = executarOrdemServicoHandler;
+        _finalizarOrdemServicoHandler = finalizarOrdemServicoHandler;
+        _cancelarOrdemServicoHandler = cancelarOrdemServicoHandler;
+        _solicitanteAnonimoHandler = solicitanteAnonimoHandler;
     }
 
     [HttpGet("{idOrdemServico:long}")]
@@ -81,6 +102,7 @@ public class OrdemServicoController : ControllerBase
             return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
         }
     }
+    
     [HttpGet("solicitados")]
     public async Task<IActionResult> ObterTodosOrdemServicosSolicitadosAsync(int paginaAtual = 1, int tamanhoPagina = 25)
     {
@@ -122,6 +144,106 @@ public class OrdemServicoController : ControllerBase
             if (response == null)
                 return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
 
+
+            return Ok(new Response { Sucesso = true, Conteudo = response });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
+        }
+    }
+
+    [HttpPatch("{idOrdemServico:long}/aprovar")]
+    public async Task<IActionResult> AprovarOrdemServicoAsync(long idOrdemServico)
+    {
+        var idPerfilRequest = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var response = await _aprovarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+
+            if (response == null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+
+            return Ok(new Response { Sucesso = true, Conteudo = response });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
+        }
+    }
+
+    [HttpPatch("{idOrdemServico:long}/executar")]
+    public async Task<IActionResult> ExecutarOrdemServicoAsync(long idOrdemServico)
+    {
+        var idPerfilRequest = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var response = await _executarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+
+            if (response == null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+
+            return Ok(new Response { Sucesso = true, Conteudo = response });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
+        }
+    }
+
+    [HttpPatch("{idOrdemServico:long}/finalizar")]
+    public async Task<IActionResult> FinalizarOrdemServicoAsync(long idOrdemServico)
+    {
+        var idPerfilRequest = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var response = await _finalizarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+
+            if (response == null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+
+            return Ok(new Response { Sucesso = true, Conteudo = response });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
+        }
+    }
+
+    [HttpPatch("{idOrdemServico:long}/cancelar")]
+    public async Task<IActionResult> CancelarOrdemServicoAsync(long idOrdemServico)
+    {
+        var idPerfilRequest = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var response = await _cancelarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+
+            if (response == null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+
+            return Ok(new Response { Sucesso = true, Conteudo = response });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
+        }
+    }
+
+    [HttpPatch("{idOrdemServico:long}/solicitante-anonimo")]
+    public async Task<IActionResult> AtualizarSolicitanteAnonimoAsync(long idOrdemServico, SolicitanteAnonimoRequest request)
+    {
+        var idPerfilRequest = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var response = await _solicitanteAnonimoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
+
+            if (response == null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
 
             return Ok(new Response { Sucesso = true, Conteudo = response });
         }

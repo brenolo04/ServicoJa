@@ -3,8 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Aprovar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Cancelar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Executar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Finalizar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
 using ServicoJa.Application.UseCases.OrdemServico.Criar;
 using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
 using ServicoJa.Application.UseCases.OrdemServico.ObterTodosPrestados;
@@ -48,10 +52,16 @@ public static class DependencyInjection
         services.AddScoped<CriarServicoHandler>();
         services.AddScoped<ObterServicoPorIdHandler>();
         services.AddScoped<ObterTodosServicosHandler>();
+
         services.AddScoped<CriarOrdemServicoHandler>();
         services.AddScoped<ObterOrdemServicoPorIdHandler>();
         services.AddScoped<ObterTodosOrdemServicosPrestadosHandler>();
         services.AddScoped<ObterTodosOrdemServicosSolicitadosHandler>();
+        services.AddScoped<AprovarOrdemServicoHandler>();
+        services.AddScoped<ExecutarOrdemServicoHandler>();
+        services.AddScoped<FinalizarOrdemServicoHandler>();
+        services.AddScoped<CancelarOrdemServicoHandler>();
+        services.AddScoped<SolicitanteAnonimoHandler>();
 
         return services;
     }

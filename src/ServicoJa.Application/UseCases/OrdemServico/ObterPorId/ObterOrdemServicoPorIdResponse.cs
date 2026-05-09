@@ -5,8 +5,7 @@ namespace ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
 public record ObterOrdemServicoPorIdResponse
 (
     long IdServico,
-    long IdPerfilPrestador,
-    long? IdPerfilSolicitante,
+    string NomePrestador,
     string? NomeSolicitante,
     bool SolicitanteAnonimo,
     string Cep,

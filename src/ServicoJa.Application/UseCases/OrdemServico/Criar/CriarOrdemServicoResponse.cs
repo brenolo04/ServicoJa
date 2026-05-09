@@ -6,7 +6,6 @@ public record CriarOrdemServicoResponse
 (
     long Id,
     long IdServico,
-    long IdPerfilPrestador,
     long? IdPerfilSolicitante,
     string? NomeSolicitante,
     bool SolicitanteAnonimo,

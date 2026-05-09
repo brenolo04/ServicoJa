@@ -19,7 +19,10 @@ public class OrdemServicoRepository : IOrdemServicoRepository
         => await _context.OrdemServicos.AddAsync(ordemServico);
 
     public async Task<OrdemServico?> ObterOrdemServicoPorIdAsync(long id)
-        => await _context.OrdemServicos.FirstOrDefaultAsync(x => x.Id == id);
+        => await _context.OrdemServicos
+        .Include(os => os.PerfilPrestador)
+        .Include(os => os.PerfilSolicitante)
+        .FirstOrDefaultAsync(x => x.Id == id);
 
     public async Task<IEnumerable<OrdemServico>> ObterTodosOrdemServicosPrestadosAsync(long idPerfil, int paginaAtual, int tamanhoPagina)
         => await _context.OrdemServicos

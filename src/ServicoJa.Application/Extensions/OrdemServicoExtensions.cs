@@ -1,4 +1,6 @@
 ﻿using ServicoJa.Application.UseCases.OrdemServico;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
 using ServicoJa.Application.UseCases.OrdemServico.Criar;
 using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
 using ServicoJa.Domain.Models;
@@ -10,8 +12,8 @@ public static class OrdemServicoExtensions
     public static CriarOrdemServicoResponse ParaCriarOrdemServicoResponse(this OrdemServico ordemServico)
         => new
         (
+            ordemServico.Id,
             ordemServico.IdServico,
-            ordemServico.IdPerfilPrestador,
             ordemServico.IdPerfilSolicitante,
             ordemServico.NomeSolicitante,
             ordemServico.SolicitanteAnonimo,
@@ -30,9 +32,8 @@ public static class OrdemServicoExtensions
         => new
         (
             ordemServico.IdServico,
-            ordemServico.IdPerfilPrestador,
-            ordemServico.IdPerfilSolicitante,
-            ordemServico.NomeSolicitante,
+            ordemServico.PerfilPrestador.Nome,
+            ordemServico.SolicitanteAnonimo ? ordemServico.NomeSolicitante : ordemServico.PerfilSolicitante.Nome,
             ordemServico.SolicitanteAnonimo,
             ordemServico.Endereco.Cep,
             ordemServico.Endereco.Cidade,
@@ -45,10 +46,10 @@ public static class OrdemServicoExtensions
             ordemServico.Status
         );
 
-    public static ObterTodosOrdemServicosResponse ParaObterTodosOrdemServicosPrestadosResponse(this IEnumerable<OrdemServico> ordemServico, int totalRegistros)
+    public static ObterTodosResponse ParaObterTodosOrdemServicosPrestadosResponse(this IEnumerable<OrdemServico> ordemServico, int totalRegistros)
     {
         var ordemServicosSaida = ordemServico.Select(os => 
-            new OrdemServicosSaida
+            new OrdemServicoSaida
             (
                 os.Id,
                 os.Servico.Nome, 
@@ -65,13 +66,13 @@ public static class OrdemServicoExtensions
             )
         );
 
-        return new ObterTodosOrdemServicosResponse(ordemServicosSaida, totalRegistros);
+        return new ObterTodosResponse(ordemServicosSaida, totalRegistros);
     }
 
-    public static ObterTodosOrdemServicosResponse ParaObterTodosOrdemServicosSolicitadosResponse(this IEnumerable<OrdemServico> ordemServico, int totalRegistros)
+    public static ObterTodosResponse ParaObterTodosOrdemServicosSolicitadosResponse(this IEnumerable<OrdemServico> ordemServico, int totalRegistros)
     {
         var ordemServicosSaida = ordemServico.Select(os =>
-            new OrdemServicosSaida
+            new OrdemServicoSaida
             (
                 os.Id,
                 os.Servico.Nome,
@@ -88,6 +89,12 @@ public static class OrdemServicoExtensions
             )
         );
 
-        return new ObterTodosOrdemServicosResponse(ordemServicosSaida, totalRegistros);
+        return new ObterTodosResponse(ordemServicosSaida, totalRegistros);
     }
+
+    public static StatusResponse ParaStatusResponse(this OrdemServico ordemServico)
+        => new(ordemServico.Status);
+
+    public static SolicitanteAnonimoResponse ParaSolicitanteAnonimoResponse(this OrdemServico ordemServico)
+        => new(ordemServico.NomeSolicitante!);
 }
