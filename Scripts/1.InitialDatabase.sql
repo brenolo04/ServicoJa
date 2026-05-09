@@ -90,7 +90,7 @@ CREATE TABLE "Servicos" (
     "Descricao" varchar NOT NULL,
     "Valor" numeric(10,2) NOT NULL,
     "Inativo" boolean NOT NULL DEFAULT FALSE,
-    "DataCriado" timestamp without time zone NOT NULL,
+    "DataCriado" timestamp with time zone NOT NULL,
     CONSTRAINT "PK_Servicos" PRIMARY KEY ("Id"),
     CONSTRAINT "FK_Servicos_Perfis_IdPerfil" FOREIGN KEY ("IdPerfil") REFERENCES "Perfis" ("Id")
 );
@@ -107,9 +107,9 @@ CREATE TABLE "OrdemServicos" (
     "Cidade" varchar NOT NULL,
     "Numero" varchar,
     "Rua" varchar NOT NULL,
-    "DataMarcado" timestamp without time zone NOT NULL,
-    "DataFinalizado" timestamp without time zone,
-    "DataCriacao" timestamp without time zone NOT NULL,
+    "DataMarcado" timestamp with time zone NOT NULL,
+    "DataFinalizado" timestamp with time zone,
+    "DataCriacao" timestamp with time zone NOT NULL,
     "Status" integer NOT NULL,
     CONSTRAINT "PK_OrdemServicos" PRIMARY KEY ("Id"),
     CONSTRAINT "FK_OrdemServicos_Perfis_IdPerfilPrestador" FOREIGN KEY ("IdPerfilPrestador") REFERENCES "Perfis" ("Id") ON DELETE RESTRICT,

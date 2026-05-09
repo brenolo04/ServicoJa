@@ -23,10 +23,9 @@ public class PerfilMap : IEntityTypeConfiguration<Perfil>
             .HasForeignKey(p => p.IdUsuarioIdentity)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasMany(p => p.Servicos)
-            .WithOne(s => s.Perfil)
-            .HasForeignKey(s => s.IdPerfil)
-            .OnDelete(DeleteBehavior.Restrict);
-
+        builder.Property(p => p.Nome)
+            .HasColumnName("nome")
+            .HasColumnType("varchar")
+            .HasMaxLength(80);
     }
 }

@@ -4,10 +4,6 @@ using ServicoJa.Domain.Repositories;
 using ServicoJa.Infra.Config;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ServicoJa.Infra.Repositories;
 
 public class OrdemServicoRepository : IOrdemServicoRepository
@@ -23,19 +19,42 @@ public class OrdemServicoRepository : IOrdemServicoRepository
         => await _context.OrdemServicos.AddAsync(ordemServico);
 
     public async Task<OrdemServico?> ObterOrdemServicoPorIdAsync(long id)
-        => await _context.OrdemServicos.FirstOrDefaultAsync(x => x.Id == id);
+        => await _context.OrdemServicos
+        .Include(os => os.PerfilPrestador)
+        .Include(os => os.PerfilSolicitante)
+        .FirstOrDefaultAsync(x => x.Id == id);
 
-    public async Task<IEnumerable<OrdemServico>> ObterTodosServicosPrestadosAsync(long idPerfil)
+    public async Task<IEnumerable<OrdemServico>> ObterTodosOrdemServicosPrestadosAsync(long idPerfil, int paginaAtual, int tamanhoPagina)
         => await _context.OrdemServicos
             .AsNoTracking()
-            .Where(x => x.IdPerfilPrestador == idPerfil)
+            .Take(tamanhoPagina)
+            .Skip((paginaAtual - 1) * tamanhoPagina)
+            .Where(os => os.IdPerfilPrestador == idPerfil)
+            .Include(os => os.PerfilSolicitante)
+            .Include(os => os.Servico)
             .ToListAsync();
 
-    public async Task<IEnumerable<OrdemServico>> ObterTodosServicosSolicitadosAsync(long idPerfil)
+    public async Task<IEnumerable<OrdemServico>> ObterTodosOrdemServicosSolicitadosAsync(long idPerfil, int paginaAtual, int tamanhoPagina)
         => await _context.OrdemServicos
             .AsNoTracking()
-            .Where(x => x.IdPerfilSolicitante == idPerfil)
+            .Take(tamanhoPagina)
+            .Skip((paginaAtual - 1) * tamanhoPagina)
+            .Where(os => os.IdPerfilSolicitante == idPerfil)
+            .Include(os => os.PerfilPrestador)
+            .Include(os => os.Servico)
             .ToListAsync();
+
+    public async Task<int> TotalPaginasOrdemServicosPrestadosAsync(long idPerfil)
+        => await _context.OrdemServicos
+            .AsNoTracking()
+            .Where(os => os.IdPerfilPrestador == idPerfil)
+            .CountAsync();
+
+    public async Task<int> TotalPaginasOrdemServicosSolicitadosAsync(long idPerfil)
+        => await _context.OrdemServicos
+            .AsNoTracking()
+            .Where(os => os.IdPerfilSolicitante == idPerfil)
+            .CountAsync();
 
     public async Task SalvarAsync()
         => await _context.SaveChangesAsync();

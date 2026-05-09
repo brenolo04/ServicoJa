@@ -35,15 +35,15 @@ public class OrdemServicoMap : IEntityTypeConfiguration<OrdemServico>
 
         builder.Property(o => o.DataMarcado)
             .IsRequired()
-            .HasColumnType("timestamp without time zone");
+            .HasColumnType("timestamp with time zone");
             
         builder.Property(o => o.DataFinalizado)
             .IsRequired(false)
-            .HasColumnType("timestamp without time zone");
+            .HasColumnType("timestamp with time zone");
             
         builder.Property(o => o.DataCriacao)
             .IsRequired()
-            .HasColumnType("timestamp without time zone");
+            .HasColumnType("timestamp with time zone");
             
         builder.Property(o => o.Status)
             .IsRequired()

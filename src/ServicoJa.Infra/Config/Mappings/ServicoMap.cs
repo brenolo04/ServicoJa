@@ -39,10 +39,10 @@ public class ServicoMap : IEntityTypeConfiguration<Servico>
 
         builder.Property(s => s.DataCriado)
             .IsRequired()
-            .HasColumnType("timestamp without time zone");
+            .HasColumnType("timestamp with time zone");
 
         builder.HasOne(s => s.Perfil)
-            .WithMany(p => p.Servicos)
+            .WithMany()
             .HasForeignKey(s => s.IdPerfil)
             .OnDelete(DeleteBehavior.NoAction);
     }

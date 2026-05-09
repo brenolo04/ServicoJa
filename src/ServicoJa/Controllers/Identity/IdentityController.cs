@@ -17,7 +17,7 @@ namespace ServicoJa.Controllers.Identity;
 [Route("api/identity")]
 public class IdentityController : ControllerBase
 {
-    public sealed record RegistrarRequest(string Email, string Senha);
+    public sealed record RegistrarRequest(string Nome, string Email, string Senha);
     public sealed record LoginRequest(string Email, string Senha);
     public sealed record LoginResponse(string AccessToken, string RefreshToken);
     public sealed record RefreshTokenRequest(string RefreshToken);
@@ -57,7 +57,7 @@ public class IdentityController : ControllerBase
             if (!resultado.Succeeded)
                 return BadRequest(resultado.Errors);
 
-            var perfil = new Perfil(usuario.Id);
+            var perfil = new Perfil(usuario.Id, request.Nome);
 
             _context.Perfis.Add(perfil);
             await _context.SaveChangesAsync();
@@ -84,19 +84,20 @@ public class IdentityController : ControllerBase
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Senha))
                 return BadRequest(new { Mensagem = "Email e senha devem ser preenchidos" });
 
-            var usuario = await _userManager.FindByEmailAsync(request.Email);
+            var usuarioIdentity = await _userManager.FindByEmailAsync(request.Email);
 
-            if (usuario is null || !await _userManager.CheckPasswordAsync(usuario, request.Senha))
+            if (usuarioIdentity is null || !await _userManager.CheckPasswordAsync(usuarioIdentity, request.Senha))
                 return BadRequest(new { Mensagem = "Usuário não encontrado ou crendenciais inválidas" });
 
             var refreshToken = new RefreshToken
             {
                 Id = Guid.NewGuid(),
-                IdUsuarioIdentity = usuario.Id,
+                IdUsuarioIdentity = usuarioIdentity.Id,
                 Token = GerarRefreshToken(),
-                ExpiresOnUtc = DateTime.Now.AddDays(7),
+                ExpiresOnUtc = DateTime.UtcNow.AddDays(7),
             };
 
+            await _context.RefreshTokens.Where(x => x.IdUsuarioIdentity == usuarioIdentity.Id).ExecuteDeleteAsync();
             await _context.RefreshTokens.AddAsync(refreshToken);
             await _context.SaveChangesAsync();
 
@@ -105,7 +106,7 @@ public class IdentityController : ControllerBase
             return Ok(new Response
             {
                 Sucesso = true,
-                Conteudo = new LoginResponse(GerarToken(usuario), refreshToken.Token)
+                Conteudo = new LoginResponse(GerarToken(usuarioIdentity), refreshToken.Token)
             });
         }
         catch (Exception)
@@ -136,7 +137,7 @@ public class IdentityController : ControllerBase
                 Id = Guid.NewGuid(),
                 Token = GerarRefreshToken(),
                 IdUsuarioIdentity = usuarioIdentity.Id,
-                ExpiresOnUtc = DateTime.Now.AddDays(7),
+                ExpiresOnUtc = DateTime.UtcNow.AddDays(7),
             };
 
             await _context.RefreshTokens.Where(x => x.IdUsuarioIdentity == usuarioIdentity.Id).ExecuteDeleteAsync();
@@ -165,7 +166,7 @@ public class IdentityController : ControllerBase
         List<Claim> claims =
         [
             new(JwtRegisteredClaimNames.Sub, usuarioIdentity.Id.ToString()),
-            new("perfilId", idPerfil.Id.ToString()),
+            new("idPerfil", idPerfil.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, usuarioIdentity.Email!),
         ];
 

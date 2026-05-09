@@ -4,12 +4,25 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Aprovar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Cancelar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Endereco;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Executar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Finalizar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
+using ServicoJa.Application.UseCases.OrdemServico.Criar;
+using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
+using ServicoJa.Application.UseCases.OrdemServico.ObterTodosPrestados;
+using ServicoJa.Application.UseCases.OrdemServico.ObterTodosSolicitados;
 using ServicoJa.Application.UseCases.Servico.Criar;
 using ServicoJa.Application.UseCases.Servico.ObterPorId;
 using ServicoJa.Application.UseCases.Servico.ObterTodos;
+using ServicoJa.Domain.Interfaces.Repositories;
+using ServicoJa.Domain.Interfaces.Services;
 using ServicoJa.Domain.Repositories;
 using ServicoJa.Infra.Config;
 using ServicoJa.Infra.Repositories;
+using ServicoJa.Infra.Services;
 using System.Text;
 
 namespace ServicoJa.Infra.IoC;
@@ -26,12 +39,31 @@ public static class DependencyInjection
 
     public static IServiceCollection AddDependencies(this IServiceCollection services)
     {
+
+        services.AddHttpClient("ViaCep", httpOptions =>
+        {
+            httpOptions.BaseAddress = new Uri("https://viacep.com.br/");
+        });
+        services.AddScoped<IEnderecoService, ViaCepService>();
+
+        services.AddScoped<IPerfilRepository, PerfilRepository>();
+        services.AddScoped<IServicoRepository, ServicoRepository>();
+        services.AddScoped<IOrdemServicoRepository, OrdemServicoRepository>();
+
         services.AddScoped<CriarServicoHandler>();
         services.AddScoped<ObterServicoPorIdHandler>();
         services.AddScoped<ObterTodosServicosHandler>();
 
-        services.AddScoped<IServicoRepository, ServicoRepository>();
-        services.AddScoped<IOrdemServicoRepository, OrdemServicoRepository>();
+        services.AddScoped<CriarOrdemServicoHandler>();
+        services.AddScoped<ObterOrdemServicoPorIdHandler>();
+        services.AddScoped<ObterTodosOrdemServicosPrestadosHandler>();
+        services.AddScoped<ObterTodosOrdemServicosSolicitadosHandler>();
+        services.AddScoped<AprovarOrdemServicoHandler>();
+        services.AddScoped<ExecutarOrdemServicoHandler>();
+        services.AddScoped<FinalizarOrdemServicoHandler>();
+        services.AddScoped<CancelarOrdemServicoHandler>();
+        services.AddScoped<SolicitanteAnonimoHandler>();
+        services.AddScoped<EnderecoOrdemServicoHandler>();
 
         return services;
     }

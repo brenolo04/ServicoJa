@@ -39,7 +39,7 @@ public class OrdemServico : EntidadeBase
     public Endereco Endereco { get; private set; }
     public DateTime DataMarcado { get; private set; }
     public DateTime? DataFinalizado { get; private set; }
-    public DateTime DataCriacao { get; } = DateTime.Now;
+    public DateTime DataCriacao { get; } = DateTime.UtcNow;
     public EStatusServico Status { get; private set; } = EStatusServico.AguardandoAprovacao;
 
     #endregion
@@ -54,39 +54,51 @@ public class OrdemServico : EntidadeBase
 
     #region Regras
 
-    public void AtualizarOrdemServico(long? idSolicitante, string nomeSolicitante, Endereco endereco, DateTime dataMarcado)
+    public void AtualizarSolicitanteAnonimo(string nomeSolicitante)
     {
+        if (string.IsNullOrEmpty(nomeSolicitante))
+            throw new AppDomainUnloadedException("Nome do solicitante anônimo não pode ser vazio.");
 
-        if (!string.IsNullOrEmpty(nomeSolicitante))
-        {
-            IdPerfilSolicitante = null;
-            NomeSolicitante = nomeSolicitante;
-            SolicitanteAnonimo = true;
-        }
-        else if (idSolicitante is > 0 && idSolicitante != null)
-        {
-            IdPerfilSolicitante = idSolicitante;
-            NomeSolicitante = null;
-            SolicitanteAnonimo = false;
-        }
-        else
-            throw new AppDomainUnloadedException();
+        NomeSolicitante = nomeSolicitante;
+    }
+    
+    public void VincularEndereco(Endereco endereco)
+    {
+        var ehAlgumaPropriedadeVazia = 
+            string.IsNullOrEmpty(endereco.Cep) || 
+            string.IsNullOrEmpty(endereco.Cidade) || 
+            string.IsNullOrEmpty(endereco.Bairro) || 
+            string.IsNullOrEmpty(endereco.Rua);
+
+        if (ehAlgumaPropriedadeVazia)
+            throw new AppDomainUnloadedException("Cep, Cidade, Bairro e Rua do endereço não pode ser vazios");
 
         Endereco = endereco;
-        DataMarcado = dataMarcado;
+    }
+    
+    public void AprovarOrdemServico()
+    {
+        if(Status != EStatusServico.AguardandoAprovacao)
+            throw new AppDomainUnloadedException("Só pode ser status Aprovado quando status for Aguardando Aprovação");
 
+        Status = EStatusServico.Aprovado;
     }
 
-    public void VincularEndereco(Endereco endereco)
-        => Endereco = endereco;
+    public void ExecutarOrdemServico()
+    {
+        if (Status == EStatusServico.Cancelado || Status == EStatusServico.Finalizado)
+            throw new AppDomainUnloadedException("Só pode ser status Executando quando status for diferente de Cancelado e Finalizado");
+
+        Status = EStatusServico.Executando;
+    }
 
     public void FinalizarOrdemServico()
     {
         if (Status == EStatusServico.Cancelado)
-            throw new AppDomainUnloadedException();
+            throw new AppDomainUnloadedException("Só pode ser status Finalizado quando status for diferente de Cancelado");
 
         Status = EStatusServico.Finalizado;
-        DataFinalizado = DateTime.Now;
+        DataFinalizado = DateTime.UtcNow;
     }
 
     public void CancelarOrdemServico()

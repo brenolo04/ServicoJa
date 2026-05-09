@@ -3,7 +3,8 @@
 public enum EStatusServico
 {
     AguardandoAprovacao = 0,
-    Executando = 1,
-    Finalizado = 2,
-    Cancelado = 3
+    Aprovado = 1,
+    Executando = 2,
+    Finalizado = 3,
+    Cancelado = 4
 }
