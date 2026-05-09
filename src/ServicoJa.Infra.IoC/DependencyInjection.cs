@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Aprovar;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Cancelar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Endereco;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Executar;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Finalizar;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
@@ -62,6 +63,7 @@ public static class DependencyInjection
         services.AddScoped<FinalizarOrdemServicoHandler>();
         services.AddScoped<CancelarOrdemServicoHandler>();
         services.AddScoped<SolicitanteAnonimoHandler>();
+        services.AddScoped<EnderecoOrdemServicoHandler>();
 
         return services;
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServicoJa.Application.UseCases;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Aprovar;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Cancelar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Endereco;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Executar;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Finalizar;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
@@ -27,7 +28,7 @@ public class OrdemServicoController : ControllerBase
     private readonly FinalizarOrdemServicoHandler _finalizarOrdemServicoHandler;
     private readonly CancelarOrdemServicoHandler _cancelarOrdemServicoHandler;
     private readonly SolicitanteAnonimoHandler _solicitanteAnonimoHandler;
-    
+    private readonly EnderecoOrdemServicoHandler _enderecoOrdemServicoHandler;
     public OrdemServicoController
     (
         CriarOrdemServicoHandler criarOrdemServicoHandler, 
@@ -38,7 +39,8 @@ public class OrdemServicoController : ControllerBase
         ExecutarOrdemServicoHandler executarOrdemServicoHandler,
         FinalizarOrdemServicoHandler finalizarOrdemServicoHandler,
         CancelarOrdemServicoHandler cancelarOrdemServicoHandler,
-        SolicitanteAnonimoHandler solicitanteAnonimoHandler
+        SolicitanteAnonimoHandler solicitanteAnonimoHandler,
+        EnderecoOrdemServicoHandler enderecoOrdemServicoHandler
     )
     {
         _criarOrdemServicoHandler = criarOrdemServicoHandler;
@@ -50,6 +52,7 @@ public class OrdemServicoController : ControllerBase
         _finalizarOrdemServicoHandler = finalizarOrdemServicoHandler;
         _cancelarOrdemServicoHandler = cancelarOrdemServicoHandler;
         _solicitanteAnonimoHandler = solicitanteAnonimoHandler;
+        _enderecoOrdemServicoHandler = enderecoOrdemServicoHandler;
     }
 
     [HttpGet("{idOrdemServico:long}")]
@@ -241,6 +244,26 @@ public class OrdemServicoController : ControllerBase
         try
         {
             var response = await _solicitanteAnonimoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
+
+            if (response == null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+
+            return Ok(new Response { Sucesso = true, Conteudo = response });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha inesperado servidor, tente novamente mais tarde" });
+        }
+    }
+
+    [HttpPatch("{idOrdemServico:long}/endereco")]
+    public async Task<IActionResult> AtualizarEnderecoAsync(long idOrdemServico, EnderecoOrdemServicoRequest request)
+    {
+        var idPerfilRequest = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var response = await _enderecoOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
 
             if (response == null)
                 return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });

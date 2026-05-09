@@ -1,5 +1,6 @@
 ﻿using ServicoJa.Application.UseCases.OrdemServico;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.Endereco;
 using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
 using ServicoJa.Application.UseCases.OrdemServico.Criar;
 using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
@@ -97,4 +98,7 @@ public static class OrdemServicoExtensions
 
     public static SolicitanteAnonimoResponse ParaSolicitanteAnonimoResponse(this OrdemServico ordemServico)
         => new(ordemServico.NomeSolicitante!);
+
+    public static EnderecoOrdemServicoResponse ParaEnderecoOrdemServicoResponse(this OrdemServico ordemServico)
+        => new(ordemServico.Endereco.Cep, ordemServico.Endereco.Cidade, ordemServico.Endereco.Bairro, ordemServico.Endereco.Rua, ordemServico.Endereco.Numero);
 }
