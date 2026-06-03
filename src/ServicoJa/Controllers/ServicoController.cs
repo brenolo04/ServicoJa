@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServicoJa.Application.UseCases;
+using ServicoJa.Application.UseCases.Servico.Atualizar;
 using ServicoJa.Application.UseCases.Servico.Criar;
 using ServicoJa.Application.UseCases.Servico.ObterPorId;
 using ServicoJa.Application.UseCases.Servico.ObterTodos;
@@ -15,11 +16,17 @@ public class ServicoController : ControllerBase
     private readonly CriarServicoHandler _criarServicoHandler;
     private readonly ObterServicoPorIdHandler _obterServicoPorIdHandler;
     private readonly ObterTodosServicosHandler _obterTodosServicosHandler;
-    public ServicoController(CriarServicoHandler criarServicoHandler, ObterServicoPorIdHandler obterServicoPorIdHandler, ObterTodosServicosHandler obterTodosServicosHandler)
+    private readonly AtualizarServicoHandler _atualizarServicoHandler;
+    public ServicoController(
+        CriarServicoHandler criarServicoHandler, 
+        ObterServicoPorIdHandler obterServicoPorIdHandler, 
+        ObterTodosServicosHandler obterTodosServicosHandler,
+        AtualizarServicoHandler atualizarServicoHandler)
     {
         _criarServicoHandler = criarServicoHandler;
         _obterServicoPorIdHandler = obterServicoPorIdHandler;
         _obterTodosServicosHandler = obterTodosServicosHandler;
+        _atualizarServicoHandler = atualizarServicoHandler;
     }
 
     [HttpGet]
@@ -81,6 +88,26 @@ public class ServicoController : ControllerBase
         try
         {
             var servicoResponse = await _criarServicoHandler.ExecuteAsync(servicoInput, idPerfil);
+
+            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = servicoResponse });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha no servidor, tente novamente mais tarde." });
+        }
+    }
+
+    [HttpPut("{idServico:long}")]
+    public async Task<IActionResult> AtualizarServicoAsync(long idServico, AtualizarServicoRequest servicoInput)
+    {
+        var idPerfil = long.Parse(User.FindFirst("idPerfil")!.Value);
+
+        try
+        {
+            var servicoResponse = await _atualizarServicoHandler.ExecuteAsync(idServico, idPerfil, servicoInput);
+
+            if (servicoResponse is null)
+                return BadRequest(new Response { Sucesso = false, Mensagem = "Alguma informação é incoêrente. Revise os dados enviados e tente novamente!"});
 
             return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = servicoResponse });
         }
