@@ -5,6 +5,8 @@ using ServicoJa.Application.UseCases.Servico.Atualizar;
 using ServicoJa.Application.UseCases.Servico.Criar;
 using ServicoJa.Application.UseCases.Servico.ObterPorId;
 using ServicoJa.Application.UseCases.Servico.ObterTodos;
+using ServicoJa.Domain.Errors;
+using ServicoJa.Domain.Results;
 
 namespace ServicoJa.Controllers;
 
@@ -30,8 +32,7 @@ public class ServicoController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> ObterTodosAsync
-    (
+    public async Task<IActionResult> ObterTodosAsync(
         [FromQuery] int paginaAtual = 1,
         [FromQuery] int tamanhoPagina = 20
     )
@@ -40,17 +41,32 @@ public class ServicoController : ControllerBase
 
         try
         {
-            var servicos = await _obterTodosServicosHandler.ExecuteAsync(idPerfil, paginaAtual, tamanhoPagina);
+            var result = await _obterTodosServicosHandler.ExecuteAsync(idPerfil, paginaAtual, tamanhoPagina);
+
+            if(result.Reasons.OfType<ListaVaziaSuccess>().Any())
+                return Ok(new Response
+                {
+                    Sucesso = true,
+                    Mensagem = result.Successes.FirstOrDefault()!.Message,
+                    Conteudo = new PagedResponse
+                    {
+                        Items = Array.Empty<object>(),
+                        PaginaAtual = paginaAtual,
+                        TamanhoPagina = tamanhoPagina,
+                        TotalRegistros = 0
+                    }
+                });
+            
 
             return Ok(new Response 
             { 
                 Sucesso = true, 
                 Conteudo = new PagedResponse 
                 { 
-                    Items = servicos.Servicos, 
+                    Items = result.Value.Servicos, 
                     PaginaAtual = paginaAtual, 
                     TamanhoPagina = tamanhoPagina, 
-                    TotalRegistros = servicos.TotalRegistros
+                    TotalRegistros = result.Value.TotalRegistros
                 }
             });
         }
@@ -67,12 +83,12 @@ public class ServicoController : ControllerBase
 
         try
         {
-            var servicoResponse = await _obterServicoPorIdHandler.ExecuteAsync(idServico, idPerfil);
+            var result = await _obterServicoPorIdHandler.ExecuteAsync(idServico, idPerfil);
 
-            if (servicoResponse is null)
-                return NotFound(new Response { Sucesso = false, Mensagem = "Serviço não encontrado", Conteudo = servicoResponse });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = servicoResponse });
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -87,9 +103,9 @@ public class ServicoController : ControllerBase
 
         try
         {
-            var servicoResponse = await _criarServicoHandler.ExecuteAsync(servicoInput, idPerfil);
+            var result = await _criarServicoHandler.ExecuteAsync(servicoInput, idPerfil);
 
-            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = servicoResponse });
+            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = result.Value });
         }
         catch
         {
@@ -104,12 +120,12 @@ public class ServicoController : ControllerBase
 
         try
         {
-            var servicoResponse = await _atualizarServicoHandler.ExecuteAsync(idServico, idPerfil, servicoInput);
+            var result = await _atualizarServicoHandler.ExecuteAsync(idServico, idPerfil, servicoInput);
 
-            if (servicoResponse is null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Alguma informação é incoêrente. Revise os dados enviados e tente novamente!"});
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = servicoResponse });
+            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = result.Value });
         }
         catch
         {

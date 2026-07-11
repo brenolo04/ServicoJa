@@ -18,6 +18,9 @@ public class ServicoRepository : IServicoRepository
     public async Task<Servico?> ObterServicoPorIdAsync(long idServico)
         => await _context.Servicos.FirstOrDefaultAsync(x => x.Id == idServico);
 
+    public async Task<Servico?> ObterServicoPorIdEPerfilAsync(long idServico, long idPerfil)
+        => await _context.Servicos.FirstOrDefaultAsync(x => x.Id == idServico && x.IdPerfil == idPerfil);
+
     public async Task<IEnumerable<Servico>> ObterTodosAsync(long idPerfil, int paginaAtual, int tamanhoPagina)
         => await _context.Servicos
             .AsNoTracking()

@@ -1,6 +1,7 @@
-﻿using ServicoJa.Application.Extensions;
+﻿using FluentResults;
 using ServicoJa.Domain.Interfaces.Services;
 using ServicoJa.Domain.Repositories;
+using ServicoJa.Domain.Results;
 
 namespace ServicoJa.Application.UseCases.OrdemServico.Atualizar.Endereco;
 
@@ -15,22 +16,35 @@ public class EnderecoOrdemServicoHandler
         _enderecoService = enderecoService;
     }
 
-    public async Task<EnderecoOrdemServicoResponse?> ExecuteAsync(long idOrdemServico, long idPerfilRequest, EnderecoOrdemServicoRequest request)
+    public async Task<Result<EnderecoOrdemServicoResponse>> ExecuteAsync(long idOrdemServico, long idPerfilRequest, EnderecoOrdemServicoRequest request)
     {
         var ordemServico = await _ordemServicoRepository.ObterOrdemServicoPorIdAsync(idOrdemServico);
 
-        if(ordemServico is null || ordemServico.IdPerfilSolicitante != idPerfilRequest) return null;
-        
+        if (ordemServico is null)
+            return Result.Fail(new EntidadeVaziaError("Ordem de serviço", idOrdemServico));
+
+        if (ordemServico.IdPerfilSolicitante != idPerfilRequest && !ordemServico.SolicitanteAnonimo)
+            return Result.Fail(new DomainError("Não é o solicitante do serviço", idOrdemServico));
+
         var enderecoExterno = await _enderecoService.EnderecoPorCep(request.Cep);
 
         if (enderecoExterno is null)
-            return null;
+            return Result.Fail(new DomainError("CEP inválido", idOrdemServico));
 
         var endereco = new Domain.ValueObjects.Endereco(enderecoExterno.Logradouro, enderecoExterno.Bairro, enderecoExterno.Localidade, request.Cep, request.Numero);
-        ordemServico.VincularEndereco(endereco);
+        var result = ordemServico.VincularEndereco(endereco);
+
+        if(result.IsFailed)
+            return Result.Fail(result.Errors);
 
         await _ordemServicoRepository.SalvarAsync();
 
-        return ordemServico.ParaEnderecoOrdemServicoResponse();
+        return Result.Ok(new EnderecoOrdemServicoResponse(
+            ordemServico.Endereco.Cep,
+            ordemServico.Endereco.Cidade,
+            ordemServico.Endereco.Bairro,
+            ordemServico.Endereco.Rua,
+            ordemServico.Endereco.Numero
+        ));
     }
 }

@@ -4,10 +4,15 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;ARM32</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Interfaces/Services/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentResults" Version="4.0.0" />
   </ItemGroup>
 
 </Project>

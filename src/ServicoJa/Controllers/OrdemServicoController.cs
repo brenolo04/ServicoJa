@@ -11,6 +11,8 @@ using ServicoJa.Application.UseCases.OrdemServico.Criar;
 using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
 using ServicoJa.Application.UseCases.OrdemServico.ObterTodosPrestados;
 using ServicoJa.Application.UseCases.OrdemServico.ObterTodosSolicitados;
+using ServicoJa.Domain.Errors;
+using ServicoJa.Domain.Results;
 
 namespace ServicoJa.Controllers;
 
@@ -62,12 +64,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _ordemServicoPorIdHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+            var result = await _ordemServicoPorIdHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response});
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -82,18 +87,29 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _obterTodosOrdemServicosPrestadosHandler.ExecuteAsync(idPerfilRequest, paginaAtual, tamanhoPagina);
+            var result = await _obterTodosOrdemServicosPrestadosHandler.ExecuteAsync(idPerfilRequest, paginaAtual, tamanhoPagina);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
-
-            return Ok(new Response 
-                { 
-                    Sucesso = true, 
-                    Conteudo = new PagedResponse 
+            if (result.Reasons.OfType<ListaVaziaSuccess>().Any())
+                return Ok(new Response
+                {
+                    Sucesso = true,
+                    Mensagem = result.Successes.FirstOrDefault()!.Message,
+                    Conteudo = new PagedResponse
                     {
-                        Items = response.OrdemServicos,
-                        TotalRegistros = response.TotalRegistros,
+                        Items = Array.Empty<object>(),
+                        PaginaAtual = paginaAtual,
+                        TamanhoPagina = tamanhoPagina,
+                        TotalRegistros = 0
+                    }
+                });
+
+            return Ok(new Response
+                {
+                    Sucesso = true,
+                    Conteudo = new PagedResponse
+                    {
+                        Items = result.Value.OrdemServicos,
+                        TotalRegistros = result.Value.TotalRegistros,
                         TamanhoPagina = tamanhoPagina,
                         PaginaAtual = paginaAtual,
                     }
@@ -113,18 +129,29 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _obterTodosOrdemServicosSolicitadosHandler.ExecuteAsync(idPerfilRequest, paginaAtual, tamanhoPagina);
+            var result = await _obterTodosOrdemServicosSolicitadosHandler.ExecuteAsync(idPerfilRequest, paginaAtual, tamanhoPagina);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<ListaVaziaSuccess>().Any())
+                return Ok(new Response
+                {
+                    Sucesso = true,
+                    Mensagem = result.Successes.FirstOrDefault()!.Message,
+                    Conteudo = new PagedResponse
+                    {
+                        Items = Array.Empty<object>(),
+                        PaginaAtual = paginaAtual,
+                        TamanhoPagina = tamanhoPagina,
+                        TotalRegistros = 0
+                    }
+                });
 
             return Ok(new Response
             {
                 Sucesso = true,
                 Conteudo = new PagedResponse
                 {
-                    Items = response.OrdemServicos,
-                    TotalRegistros = response.TotalRegistros,
+                    Items = result.Value.OrdemServicos,
+                    TotalRegistros = result.Value.TotalRegistros,
                     TamanhoPagina = tamanhoPagina,
                     PaginaAtual = paginaAtual,
                 }
@@ -142,13 +169,12 @@ public class OrdemServicoController : ControllerBase
     {
         try
         {
-            var response = await _criarOrdemServicoHandler.ExecuteAsync(request);
+            var result = await _criarOrdemServicoHandler.ExecuteAsync(request);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -163,12 +189,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _aprovarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+            var result = await _aprovarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -183,12 +212,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _executarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+            var result = await _executarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -203,12 +235,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _finalizarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+            var result = await _finalizarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -223,12 +258,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _cancelarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
+            var result = await _cancelarOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -243,12 +281,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _solicitanteAnonimoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
+            var result = await _solicitanteAnonimoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
@@ -263,12 +304,15 @@ public class OrdemServicoController : ControllerBase
 
         try
         {
-            var response = await _enderecoOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
+            var result = await _enderecoOrdemServicoHandler.ExecuteAsync(idOrdemServico, idPerfilRequest, request);
 
-            if (response == null)
-                return BadRequest(new Response { Sucesso = false, Mensagem = "Falha em alguma informação, verifique novamente os dados!" });
+            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
-            return Ok(new Response { Sucesso = true, Conteudo = response });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
