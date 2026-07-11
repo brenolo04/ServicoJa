@@ -1,7 +1,13 @@
-﻿using ServicoJa.Application.Extensions;
+﻿using FluentResults;
+using FluentResults;
 using ServicoJa.Domain.Interfaces.Repositories;
 using ServicoJa.Domain.Interfaces.Services;
 using ServicoJa.Domain.Repositories;
+using ServicoJa.Domain.Results;
+using ServicoJa.Application.UseCases.OrdemServico.Criar;
+using ServicoJa.Domain.Interfaces.Services;
+using ServicoJa.Domain.Repositories;
+using ServicoJa.Domain.Results;
 
 namespace ServicoJa.Application.UseCases.OrdemServico.Criar;
 
@@ -26,16 +32,16 @@ public class CriarOrdemServicoHandler
         _enderecoService = enderecoService;
     }
 
-    public async Task<CriarOrdemServicoResponse?> ExecuteAsync(CriarOrdemServicoRequest request)
+    public async Task<Result<CriarOrdemServicoResponse>> ExecuteAsync(CriarOrdemServicoRequest request)
     {
         var servico = await _servicoRepository.ObterServicoPorIdAsync(request.IdServico);
         var perfil = await _perfilRepository.ObterPerfilPorIdAsync(request.IdPerfilSolicitante);
 
         if (servico is null && perfil is null && string.IsNullOrEmpty(request.NomeSolicitante))
-            return null;
+            return Result.Fail(new EntidadeVaziaError("Serviço", request.IdServico));
 
         if (servico!.Inativo)
-            return null;
+            return Result.Fail(new DomainError("Serviço inativo", request.IdServico));
 
         var ordemServico = string.IsNullOrEmpty(request.NomeSolicitante) 
             ? new Domain.Models.OrdemServico(servico!.IdPerfil, request.IdPerfilSolicitante, request.IdServico, request.DataMarcado) 
@@ -44,15 +50,33 @@ public class CriarOrdemServicoHandler
         var enderecoExterno = await _enderecoService.EnderecoPorCep(request.Cep);
 
         if (enderecoExterno is null)
-            return null;
+            return Result.Fail(new DomainError("CEP inválido", 0));
 
         var endereco = new Domain.ValueObjects.Endereco(enderecoExterno.Logradouro, enderecoExterno.Bairro, enderecoExterno.Localidade, request.Cep, request.Numero);
 
-        ordemServico.VincularEndereco(endereco);
+        var result = ordemServico.VincularEndereco(endereco);
+
+        if (result.IsFailed)
+            return Result.Fail(result.Errors);
 
         await _ordemServicoRepository.CriarOrdemServicoAsync(ordemServico);
         await _ordemServicoRepository.SalvarAsync();
 
-        return ordemServico.ParaCriarOrdemServicoResponse();
+        return Result.Ok(new CriarOrdemServicoResponse(
+            ordemServico.Id,
+            ordemServico.IdServico,
+            ordemServico.IdPerfilSolicitante,
+            ordemServico.NomeSolicitante,
+            ordemServico.SolicitanteAnonimo,
+            ordemServico.Endereco.Cep,
+            ordemServico.Endereco.Cidade,
+            ordemServico.Endereco.Bairro,
+            ordemServico.Endereco.Rua,
+            ordemServico.Endereco.Numero,
+            ordemServico.DataMarcado,
+            ordemServico.DataFinalizado,
+            ordemServico.DataCriacao,
+            ordemServico.Status
+        ));
     }
 }

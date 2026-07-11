@@ -1,4 +1,5 @@
-﻿using ServicoJa.Domain.Enums;
+﻿using FluentResults;
+using ServicoJa.Domain.Enums;
 using ServicoJa.Domain.ValueObjects;
 
 namespace ServicoJa.Domain.Models;
@@ -54,15 +55,17 @@ public class OrdemServico : EntidadeBase
 
     #region Regras
 
-    public void AtualizarSolicitanteAnonimo(string nomeSolicitante)
+    public Result AtualizarSolicitanteAnonimo(string nomeSolicitante)
     {
         if (string.IsNullOrEmpty(nomeSolicitante))
-            throw new AppDomainUnloadedException("Nome do solicitante anônimo não pode ser vazio.");
+            return Result.Fail("Nome do solicitante anônimo não pode ser vazio.");
 
         NomeSolicitante = nomeSolicitante;
+
+        return Result.Ok();
     }
     
-    public void VincularEndereco(Endereco endereco)
+    public Result VincularEndereco(Endereco endereco)
     {
         var ehAlgumaPropriedadeVazia = 
             string.IsNullOrEmpty(endereco.Cep) || 
@@ -71,34 +74,42 @@ public class OrdemServico : EntidadeBase
             string.IsNullOrEmpty(endereco.Rua);
 
         if (ehAlgumaPropriedadeVazia)
-            throw new AppDomainUnloadedException("Cep, Cidade, Bairro e Rua do endereço não pode ser vazios");
+            return Result.Fail("Nenhuma informação de endereço pode ser vazia.");
 
         Endereco = endereco;
+
+        return Result.Ok();
     }
     
-    public void AprovarOrdemServico()
+    public Result AprovarOrdemServico()
     {
-        if(Status != EStatusServico.AguardandoAprovacao)
-            throw new AppDomainUnloadedException("Só pode ser status Aprovado quando status for Aguardando Aprovação");
+        if (Status != EStatusServico.AguardandoAprovacao)
+            return Result.Fail("Só é possível aprovar ordem se Status for igual Aguardando aprovação!");
 
         Status = EStatusServico.Aprovado;
+
+        return Result.Ok();
     }
 
-    public void ExecutarOrdemServico()
+    public Result ExecutarOrdemServico()
     {
         if (Status == EStatusServico.Cancelado || Status == EStatusServico.Finalizado)
-            throw new AppDomainUnloadedException("Só pode ser status Executando quando status for diferente de Cancelado e Finalizado");
+            return Result.Fail("Só pode ser status Executando quando status for diferente de Cancelado e Finalizado");
 
         Status = EStatusServico.Executando;
+
+        return Result.Ok();
     }
 
-    public void FinalizarOrdemServico()
+    public Result FinalizarOrdemServico()
     {
         if (Status == EStatusServico.Cancelado)
-            throw new AppDomainUnloadedException("Só pode ser status Finalizado quando status for diferente de Cancelado");
+            return Result.Fail("Só pode ser status Finalizado quando status for diferente de Cancelado");
 
         Status = EStatusServico.Finalizado;
         DataFinalizado = DateTime.UtcNow;
+
+        return Result.Ok();
     }
 
     public void CancelarOrdemServico()

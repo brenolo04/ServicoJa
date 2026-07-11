@@ -1,5 +1,6 @@
-﻿using ServicoJa.Application.Extensions;
+﻿using FluentResults;
 using ServicoJa.Domain.Repositories;
+using ServicoJa.Domain.Results;
 
 namespace ServicoJa.Application.UseCases.Servico.ObterPorId;
 
@@ -12,13 +13,20 @@ public class ObterServicoPorIdHandler
         _servicoRepository = repository;    
     }
 
-    public async Task<ObterServicoPorIdResponse?> ExecuteAsync(long idServico, long idPerfil)
+    public async Task<Result<ObterServicoPorIdResponse?>> ExecuteAsync(long idServico, long idPerfil)
     {
-        var servico = await _servicoRepository.ObterServicoPorIdAsync(idServico);
+        var servico = await _servicoRepository.ObterServicoPorIdEPerfilAsync(idServico, idPerfil);
 
-        if (servico is null || servico.IdPerfil != idPerfil)
-            return null;
+        if (servico is null)
+            return Result.Fail(new EntidadeVaziaError("Serviço", idServico));
 
-        return servico.ParaObterServicoPorIdResponse();
+        return Result.Ok(new ObterServicoPorIdResponse(
+            servico.Id,
+            servico.Nome,
+            servico.Descricao,
+            servico.Valor,
+            servico.Inativo,
+            servico.DataCriado
+        ))!;
     }
 }

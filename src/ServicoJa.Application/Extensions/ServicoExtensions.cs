@@ -17,16 +17,6 @@ public static class ServicoExtensions
             servico.DataCriado
         );
 
-    public static CriarServicoResponse ParaCriarServicoResponse(this Servico servico)
-        => new(
-            servico.Id,
-            servico.Nome,
-            servico.Descricao,
-            servico.Valor,
-            servico.Inativo,
-            servico.DataCriado
-        );
-
     public static ObterTodosServicosResponse ParaObterTodosServicosResponse(this IEnumerable<Servico> servicos, int totalRegistros)
     {
         var servicosSaida = servicos.Select(servico => new ServicosSaida(servico.Id, servico.Nome, servico.Descricao));

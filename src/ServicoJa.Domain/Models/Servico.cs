@@ -1,4 +1,6 @@
-﻿namespace ServicoJa.Domain.Models;
+﻿using FluentResults;
+
+namespace ServicoJa.Domain.Models;
 
 public class Servico : EntidadeBase
 {
@@ -31,11 +33,13 @@ public class Servico : EntidadeBase
 
     #region Regras
 
-    public void AtualizarServico(string nome, string descricao, decimal valor)
+    public Result AtualizarServico(string nome, string descricao, decimal valor)
     {
         Nome = nome;
         Descricao = descricao;
         Valor = valor;
+
+        return Result.Ok();
     }
 
     public void Inativar() => Inativo = true;

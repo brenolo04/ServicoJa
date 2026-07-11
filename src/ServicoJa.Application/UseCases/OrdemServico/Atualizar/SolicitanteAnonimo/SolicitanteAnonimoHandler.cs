@@ -1,5 +1,7 @@
-﻿using ServicoJa.Application.Extensions;
+﻿using FluentResults;
 using ServicoJa.Domain.Repositories;
+using ServicoJa.Domain.Results;
+using ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
 
 namespace ServicoJa.Application.UseCases.OrdemServico.Atualizar.SolicitanteAnonimo;
 
@@ -12,23 +14,26 @@ public class SolicitanteAnonimoHandler
         _ordemServicoRepository = ordemServicoRepository;
     }
 
-    public async Task<SolicitanteAnonimoResponse?> ExecuteAsync(long idOrdemServico, long idPerfilRequest, SolicitanteAnonimoRequest request)
+    public async Task<Result<SolicitanteAnonimoResponse>> ExecuteAsync(long idOrdemServico, long idPerfilRequest, SolicitanteAnonimoRequest request)
     {
         var ordemServico = await _ordemServicoRepository.ObterOrdemServicoPorIdAsync(idOrdemServico);
 
         if (ordemServico is null)
-            return null;
+            return Result.Fail(new EntidadeVaziaError("Ordem de serviço", idOrdemServico));
 
         if (ordemServico.IdPerfilPrestador != idPerfilRequest)
-            return null;
+            return Result.Fail(new DomainError("Não é o prestador do serviço", idOrdemServico));
 
         if (!ordemServico.SolicitanteAnonimo)
-            return null;
+            return Result.Fail(new DomainError("Solicitante não é anônimo", idOrdemServico));
 
-        ordemServico.AtualizarSolicitanteAnonimo(request.Nome);
+        var result = ordemServico.AtualizarSolicitanteAnonimo(request.Nome);
+
+        if(result.IsFailed)
+            return Result.Fail(result.Errors);
 
         await _ordemServicoRepository.SalvarAsync();
 
-        return ordemServico.ParaSolicitanteAnonimoResponse();
+        return Result.Ok(new SolicitanteAnonimoResponse(ordemServico.NomeSolicitante!));
     }
 }
