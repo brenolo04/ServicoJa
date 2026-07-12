@@ -24,7 +24,7 @@ public class PerfilMap : IEntityTypeConfiguration<Perfil>
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.Property(p => p.Nome)
-            .HasColumnName("nome")
+            .HasColumnName("Nome")
             .HasColumnType("varchar")
             .HasMaxLength(80);
     }
