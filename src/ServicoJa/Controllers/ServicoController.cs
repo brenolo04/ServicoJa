@@ -122,7 +122,7 @@ public class ServicoController : ControllerBase
         {
             var result = await _atualizarServicoHandler.ExecuteAsync(idServico, idPerfil, servicoInput);
 
-            if (result.Reasons.OfType<EntidadeVaziaError>().Any())
+            if (result.IsFailed)
                 return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
             return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = result.Value });

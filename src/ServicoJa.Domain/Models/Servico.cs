@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using ServicoJa.Domain.Results;
 
 namespace ServicoJa.Domain.Models;
 
@@ -35,6 +36,13 @@ public class Servico : EntidadeBase
 
     public Result AtualizarServico(string nome, string descricao, decimal valor)
     {
+
+        if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(descricao))
+            return Result.Fail(new DomainError("Nome e descrição devem conter algum conteúdo", Id));
+
+        if (valor <= 0)
+            return Result.Fail(new DomainError("Valor deve ser maior que zero", Id));
+
         Nome = nome;
         Descricao = descricao;
         Valor = valor;
