@@ -99,14 +99,16 @@ public class IdentityController : ControllerBase
 
             await _context.RefreshTokens.Where(x => x.IdUsuarioIdentity == usuarioIdentity.Id).ExecuteDeleteAsync();
             await _context.RefreshTokens.AddAsync(refreshToken);
-            await _context.SaveChangesAsync();
 
+            var accessToken = GerarToken(usuarioIdentity);
+
+            await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
             return Ok(new Response
             {
                 Sucesso = true,
-                Conteudo = new LoginResponse(GerarToken(usuarioIdentity), refreshToken.Token)
+                Conteudo = new LoginResponse(accessToken, refreshToken.Token)
             });
         }
         catch (Exception)
