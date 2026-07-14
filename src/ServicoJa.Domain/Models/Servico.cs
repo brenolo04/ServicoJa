@@ -7,12 +7,24 @@ public class Servico : EntidadeBase
 {
     #region Construtor
 
-    public Servico(long idPerfil, string nome, string descricao, decimal valor)
+    private Servico(long idPerfil, string nome, string descricao, decimal valor)
     {
         IdPerfil = idPerfil;
         Nome = nome;
         Descricao = descricao;
         Valor = valor;
+    }
+
+    public static Result<Servico> Criar(long idPerfil, string nome, string descricao, decimal valor)
+    {
+        if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(descricao))
+            return Result.Fail(new DomainError("Nome e descrição devem conter algum conteúdo", 0));
+
+        if (valor <= 0)
+            return Result.Fail(new DomainError("Valor deve ser maior que zero", 0));
+
+        var servico = new Servico(idPerfil, nome, descricao, valor);
+        return Result.Ok(servico);
     }
 
     #endregion

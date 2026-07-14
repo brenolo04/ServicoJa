@@ -13,17 +13,20 @@ public class CriarServicoHandler
 
     public async Task<Result<CriarServicoResponse>> ExecuteAsync(CriarServicoRequest input, long idPerfil)
     {
-        var servico = new Domain.Models.Servico(idPerfil, input.Nome, input.Descricao, input.Valor);
+        var result = Domain.Models.Servico.Criar(idPerfil, input.Nome, input.Descricao, input.Valor);
 
-        await _servicoRepository.CriarServicoAsync(servico);
+        if (result.IsFailed)
+            return Result.Fail(result.Errors);
+
+        await _servicoRepository.CriarServicoAsync(result.Value);
         await _servicoRepository.SalvarAsync();
 
         return Result.Ok(new CriarServicoResponse(
-            servico.Id,
-            servico.Nome,
-            servico.Descricao,
-            servico.Valor,
-            servico.Inativo,
-            servico.DataCriado));
+            result.Value.Id,
+            result.Value.Nome,
+            result.Value.Descricao,
+            result.Value.Valor,
+            result.Value.Inativo,
+            result.Value.DataCriado));
     }
 }

@@ -113,7 +113,10 @@ public class ServicoController : ControllerBase
         {
             var result = await _criarServicoHandler.ExecuteAsync(servicoInput, idPerfil);
 
-            return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = result.Value });
+            if (result.IsFailed)
+                return BadRequest(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {
