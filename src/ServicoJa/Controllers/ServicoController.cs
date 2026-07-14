@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServicoJa.Application.UseCases;
+using ServicoJa.Application.UseCases.Servico.Ativar;
 using ServicoJa.Application.UseCases.Servico.Atualizar;
 using ServicoJa.Application.UseCases.Servico.Criar;
+using ServicoJa.Application.UseCases.Servico.Inativar;
 using ServicoJa.Application.UseCases.Servico.ObterPorId;
 using ServicoJa.Application.UseCases.Servico.ObterTodos;
 using ServicoJa.Domain.Errors;
@@ -19,16 +21,22 @@ public class ServicoController : ControllerBase
     private readonly ObterServicoPorIdHandler _obterServicoPorIdHandler;
     private readonly ObterTodosServicosHandler _obterTodosServicosHandler;
     private readonly AtualizarServicoHandler _atualizarServicoHandler;
-    public ServicoController(
-        CriarServicoHandler criarServicoHandler, 
+    private readonly InativarServicoHandler _inativarServicoHandler;
+    private readonly AtivarServicoHandler _ativarServicoHandler;
+    public ServicoController(CriarServicoHandler criarServicoHandler, 
         ObterServicoPorIdHandler obterServicoPorIdHandler, 
         ObterTodosServicosHandler obterTodosServicosHandler,
-        AtualizarServicoHandler atualizarServicoHandler)
+        AtualizarServicoHandler atualizarServicoHandler,
+        InativarServicoHandler inativarServicoHandler,
+        AtivarServicoHandler ativarServicoHandler
+    )
     {
         _criarServicoHandler = criarServicoHandler;
         _obterServicoPorIdHandler = obterServicoPorIdHandler;
         _obterTodosServicosHandler = obterTodosServicosHandler;
         _atualizarServicoHandler = atualizarServicoHandler;
+        _inativarServicoHandler = inativarServicoHandler;
+        _ativarServicoHandler = ativarServicoHandler;
     }
 
     [HttpGet]
@@ -126,6 +134,41 @@ public class ServicoController : ControllerBase
                 return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
 
             return Ok(new Response { Sucesso = true, Mensagem = "", Conteudo = result.Value });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha no servidor, tente novamente mais tarde." });
+        }
+    }
+
+    [HttpPatch("{idServico:long}/inativar")]
+    public async Task<IActionResult> InativarServicoAsync(long idServico)
+    {
+        var idPerfil = long.Parse(User.FindFirst("idPerfil")!.Value);
+        try
+        {
+            var result = await _inativarServicoHandler.ExecuteAsync(idServico, idPerfil);
+            if (result.IsFailed)
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
+        }
+        catch
+        {
+            return StatusCode(500, new Response { Sucesso = false, Mensagem = "Falha no servidor, tente novamente mais tarde." });
+        }
+    }
+
+    [HttpPatch("{idServico:long}/ativar")]
+    public async Task<IActionResult> AtivarServicoAsync(long idServico)
+    {
+        var idPerfil = long.Parse(User.FindFirst("idPerfil")!.Value);
+        try
+        {
+            var result = await _ativarServicoHandler.ExecuteAsync(idServico, idPerfil);
+            if (result.IsFailed)
+                return NotFound(new Response { Sucesso = false, Mensagem = result.Errors.FirstOrDefault()!.Message });
+
+            return Ok(new Response { Sucesso = true, Conteudo = result.Value });
         }
         catch
         {

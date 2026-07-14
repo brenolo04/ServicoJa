@@ -14,8 +14,10 @@ using ServicoJa.Application.UseCases.OrdemServico.Criar;
 using ServicoJa.Application.UseCases.OrdemServico.ObterPorId;
 using ServicoJa.Application.UseCases.OrdemServico.ObterTodosPrestados;
 using ServicoJa.Application.UseCases.OrdemServico.ObterTodosSolicitados;
+using ServicoJa.Application.UseCases.Servico.Ativar;
 using ServicoJa.Application.UseCases.Servico.Atualizar;
 using ServicoJa.Application.UseCases.Servico.Criar;
+using ServicoJa.Application.UseCases.Servico.Inativar;
 using ServicoJa.Application.UseCases.Servico.ObterPorId;
 using ServicoJa.Application.UseCases.Servico.ObterTodos;
 using ServicoJa.Domain.Interfaces.Repositories;
@@ -55,6 +57,8 @@ public static class DependencyInjection
         services.AddScoped<ObterServicoPorIdHandler>();
         services.AddScoped<ObterTodosServicosHandler>();
         services.AddScoped<AtualizarServicoHandler>();
+        services.AddScoped<InativarServicoHandler>();
+        services.AddScoped<AtivarServicoHandler>();
 
         services.AddScoped<CriarOrdemServicoHandler>();
         services.AddScoped<ObterOrdemServicoPorIdHandler>();
