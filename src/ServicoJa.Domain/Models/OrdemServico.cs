@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using ServicoJa.Domain.Enums;
+using ServicoJa.Domain.Results;
 using ServicoJa.Domain.ValueObjects;
 
 namespace ServicoJa.Domain.Models;
@@ -114,6 +115,20 @@ public class OrdemServico : EntidadeBase
 
     public void CancelarOrdemServico()
         => Status = EStatusServico.Cancelado;
+
+    public bool EhSolicitante(long idPerfil)
+        => IdPerfilSolicitante == idPerfil;
+
+    public bool EhPrestador(long idPerfil)
+        => IdPerfilPrestador == idPerfil;
+
+    public Result PodeAtualizarEndereco(long idPerfil)
+        => Result.Merge(
+            Result.FailIf(!EhSolicitante(idPerfil) && !SolicitanteAnonimo, new EntidadeVaziaError("Ordem de serviço", Id)),
+            Result.FailIf(!EhPrestador(idPerfil) && SolicitanteAnonimo, new EntidadeVaziaError("Ordem de serviço", Id)),
+            Result.FailIf(Status != EStatusServico.AguardandoAprovacao, new DomainError("Não é possível atualizar endereço se status for diferente de Aguardando Aprovação", Id)));
+    
+        
 
     #endregion
 

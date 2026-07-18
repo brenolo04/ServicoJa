@@ -22,9 +22,11 @@ public class EnderecoOrdemServicoHandler
 
         if (ordemServico is null)
             return Result.Fail(new EntidadeVaziaError("Ordem de serviço", idOrdemServico));
+        
+        var podeAtualizarEnderecoResult = ordemServico.PodeAtualizarEndereco(idPerfilRequest);
 
-        if (ordemServico.IdPerfilSolicitante != idPerfilRequest && !ordemServico.SolicitanteAnonimo)
-            return Result.Fail(new DomainError("Não é o solicitante do serviço", idOrdemServico));
+        if (podeAtualizarEnderecoResult.IsFailed)
+            return Result.Fail(podeAtualizarEnderecoResult.Errors);
 
         var enderecoExterno = await _enderecoService.EnderecoPorCep(request.Cep);
 
@@ -32,10 +34,10 @@ public class EnderecoOrdemServicoHandler
             return Result.Fail(new DomainError("CEP inválido", idOrdemServico));
 
         var endereco = new Domain.ValueObjects.Endereco(enderecoExterno.Logradouro, enderecoExterno.Bairro, enderecoExterno.Localidade, request.Cep, request.Numero);
-        var result = ordemServico.VincularEndereco(endereco);
+        var vincularEnderecoResult = ordemServico.VincularEndereco(endereco);
 
-        if(result.IsFailed)
-            return Result.Fail(result.Errors);
+        if(vincularEnderecoResult.IsFailed)
+            return Result.Fail(vincularEnderecoResult.Errors);
 
         await _ordemServicoRepository.SalvarAsync();
 
